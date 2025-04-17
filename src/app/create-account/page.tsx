@@ -1,7 +1,50 @@
+'use client';
+
 import Image from 'next/image';
 import Link from 'next/link';
+import { useState } from 'react';
+import FormInput from '@/components/FormInput';
 
 export default function CreateAccount() {
+  const [formData, setFormData] = useState({
+    name: '',
+    email: '',
+    password: '',
+    confirmPassword: ''
+  });
+
+  const [errors, setErrors] = useState({
+    name: '',
+    email: '',
+    password: '',
+    confirmPassword: ''
+  });
+
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { name, value } = e.target;
+    setFormData(prev => ({ ...prev, [name]: value }));
+  };
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    
+    const newErrors = {
+      name: formData.name ? '' : 'Campo Obrigatório, preencha-o',
+      email: formData.email ? '' : 'Campo Obrigatório, preencha-o',
+      password: formData.password ? '' : 'Campo Obrigatório, preencha-o',
+      confirmPassword: formData.password === formData.confirmPassword ? '' : 'As senhas não coincidem'
+    };
+
+    setErrors(newErrors);
+
+    if (Object.values(newErrors).some(error => error)) {
+      return;
+    }
+
+    // Here you would typically make an API call to create the account
+    // For now, we'll just redirect to login
+  };
+
   return (
     <main className="flex min-h-screen w-full items-center justify-center bg-[var(--primary)] p-4 lg:bg-[url('/images/background-login.png')] lg:bg-cover lg:bg-center lg:bg-no-repeat lg:justify-end lg:pr-16">
       <div className="relative flex h-[34.3rem] w-[54.5rem] shrink-0 overflow-hidden rounded-xl border-2 border-white/20">
@@ -28,54 +71,54 @@ export default function CreateAccount() {
           {/* Form content */}
           <div className="relative w-full max-w-md p-8 pb-12">
             {/* Add top margin to form to prevent logo overlap */}
-            <form className="mt-16 space-y-6">
-              <div className="space-y-2">
-                <label htmlFor="name" className="block text-sm font-medium text-[var(--primary)]">
-                  Nome Completo
-                </label>
-                <input
-                  type="text"
-                  id="name"
-                  className="w-full rounded-sm border-2 border-[var(--primary)] bg-white py-2.5 pl-3 text-[var(--primary)] placeholder-gray-500 focus:outline-none focus:ring-1 focus:ring-[var(--primary)]"
-                  placeholder="Digite seu nome completo"
-                />
-              </div>
+            <form onSubmit={handleSubmit} className="mt-16 space-y-6">
+              <FormInput
+                type="text"
+                id="name"
+                name="name"
+                label="Nome Completo"
+                value={formData.name}
+                onChange={handleChange}
+                error={errors.name}
+                placeholder="Digite seu nome completo"
+                required
+              />
 
-              <div className="space-y-2">
-                <label htmlFor="email" className="block text-sm font-medium text-[var(--primary)]">
-                  E-mail
-                </label>
-                <input
-                  type="email"
-                  id="email"
-                  className="w-full rounded-sm border-2 border-[var(--primary)] bg-white py-2.5 pl-3 text-[var(--primary)] placeholder-gray-500 focus:outline-none focus:ring-1 focus:ring-[var(--primary)]"
-                  placeholder="Digite seu e-mail"
-                />
-              </div>
+              <FormInput
+                type="email"
+                id="email"
+                name="email"
+                label="E-mail"
+                value={formData.email}
+                onChange={handleChange}
+                error={errors.email}
+                placeholder="Digite seu e-mail"
+                required
+              />
 
-              <div className="space-y-2">
-                <label htmlFor="password" className="block text-sm font-medium text-[var(--primary)]">
-                  Senha
-                </label>
-                <input
-                  type="password"
-                  id="password"
-                  className="w-full rounded-sm border-2 border-[var(--primary)] bg-white py-2.5 pl-3 text-[var(--primary)] placeholder-gray-500 focus:outline-none focus:ring-1 focus:ring-[var(--primary)]"
-                  placeholder="Digite sua senha"
-                />
-              </div>
+              <FormInput
+                type="password"
+                id="password"
+                name="password"
+                label="Senha"
+                value={formData.password}
+                onChange={handleChange}
+                error={errors.password}
+                placeholder="Digite sua senha"
+                required
+              />
 
-              <div className="space-y-2">
-                <label htmlFor="confirmPassword" className="block text-sm font-medium text-[var(--primary)]">
-                  Confirmar Senha
-                </label>
-                <input
-                  type="password"
-                  id="confirmPassword"
-                  className="w-full rounded-sm border-2 border-[var(--primary)] bg-white py-2.5 pl-3 text-[var(--primary)] placeholder-gray-500 focus:outline-none focus:ring-1 focus:ring-[var(--primary)]"
-                  placeholder="Confirme sua senha"
-                />
-              </div>
+              <FormInput
+                type="password"
+                id="confirmPassword"
+                name="confirmPassword"
+                label="Confirmar Senha"
+                value={formData.confirmPassword}
+                onChange={handleChange}
+                error={errors.confirmPassword}
+                placeholder="Confirme sua senha"
+                required
+              />
 
               <button
                 type="submit"

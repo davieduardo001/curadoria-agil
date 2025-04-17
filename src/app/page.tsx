@@ -1,7 +1,42 @@
+'use client';
+
 import Image from 'next/image';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
+import FormInput from '@/components/FormInput';
+import { useState } from 'react';
 
 export default function LoginPage() {
+  const router = useRouter();
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [remember, setRemember] = useState(false);
+  const [errors, setErrors] = useState({
+    email: '',
+    password: ''
+  });
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    
+    const newErrors = {
+      email: email ? '' : 'E-mail obrigatório!',
+      password: password ? '' : 'Senha obrigatória!'
+    };
+
+    setErrors(newErrors);
+
+    if (newErrors.email || newErrors.password) {
+      return;
+    }
+
+    // Here you would typically make an API call to authenticate the user
+    // For now, we'll just simulate a successful login
+    // Here you would typically make an API call to authenticate the user
+    // For now, we'll just simulate a successful login
+    router.push('/home');
+  };
+
   return (
     <main className="flex min-h-screen w-full items-center justify-center bg-[var(--primary)] p-4 lg:bg-[url('/images/background-login.png')] lg:bg-cover lg:bg-center lg:bg-no-repeat lg:justify-end lg:pr-16">
       <div className="relative flex h-[34.3rem] w-[54.5rem] shrink-0 overflow-hidden rounded-xl border-2 border-white/20">
@@ -28,45 +63,45 @@ export default function LoginPage() {
           {/* Form content */}
           <div className="relative w-full max-w-md p-8">
             {/* Add top margin to form to prevent logo overlap */}
-            <form className="mt-16 space-y-6">
-              <div className="space-y-2">
-                <label htmlFor="email" className="block text-sm font-medium text-[var(--primary)]">
-                  E-mail
-                </label>
-                <input
-                  type="email"
-                  id="email"
-                  className="w-full rounded-sm border-2 border-[var(--primary)] bg-white py-2.5 pl-3 text-[var(--primary)] placeholder-gray-500 focus:outline-none focus:ring-1 focus:ring-[var(--primary)]"
-                  placeholder="Digite seu e-mail"
-                />
-              </div>
+            <form onSubmit={handleSubmit} className="mt-16 space-y-6">
+              <FormInput
+                type="email"
+                id="email"
+                label="E-mail"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                error={errors.email}
+                placeholder="Digite seu e-mail"
+                required
+              />
 
-              <div className="space-y-2">
-                <label htmlFor="password" className="block text-sm font-medium text-[var(--primary)]">
-                  Senha
-                </label>
-                <input
-                  type="password"
-                  id="password"
-                  className="w-full rounded-sm border-2 border-[var(--primary)] bg-white py-2.5 pl-3 text-[var(--primary)] placeholder-gray-500 focus:outline-none focus:ring-1 focus:ring-[var(--primary)]"
-                  placeholder="Digite sua senha"
-                />
-              </div>
+              <FormInput
+                type="password"
+                id="password"
+                label="Senha"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                error={errors.password}
+                placeholder="Digite sua senha"
+                required
+              />
 
               <button
                 type="submit"
-                className="w-full rounded-sm border-2 border-[var(--primary)] bg-[var(--primary)] py-2.5 text-center text-white transition-colors hover:bg-[#0c3d47] focus:outline-none focus:ring-2 focus:ring-white/50 active:bg-[#071f24]"
+                className="w-full rounded-sm bg-[var(--primary)] py-3 text-center text-base font-medium text-white hover:bg-[var(--primary-dark)] focus:outline-none focus:ring-2 focus:ring-[var(--primary)] focus:ring-offset-2"
               >
                 Entrar
               </button>
 
-              <label className="flex items-center space-x-2 pt-2">
+              <div>
                 <input
                   type="checkbox"
-                  className="rounded-none border border-[var(--primary)] bg-white text-[var(--primary)] focus:ring-[var(--primary)]"
+                  checked={remember}
+                  onChange={(e) => setRemember(e.target.checked)}
+                  className="h-4 w-4 rounded border-gray-300 text-[var(--primary)] focus:ring-[var(--primary)]"
                 />
-                <span className="text-sm text-[var(--primary)]">Lembrar-me</span>
-              </label>
+                <span className="text-sm text-gray-500">Lembrar-me</span>
+              </div>
             </form>
             <div className="mt-6 text-center text-sm text-gray-500">
               <p>
