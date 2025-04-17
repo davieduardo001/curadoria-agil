@@ -2,10 +2,14 @@
 
 import Image from 'next/image';
 import Link from 'next/link';
-import { useState } from 'react';
+import { useRouter } from 'next/navigation';
 import FormInput from '@/components/FormInput';
+import { useState } from 'react';
+import { auth } from '@/lib/firebase';
+import { createUserWithEmailAndPassword } from 'firebase/auth';
 
 export default function CreateAccount() {
+  const router = useRouter();
   const [formData, setFormData] = useState({
     name: '',
     email: '',
@@ -25,7 +29,7 @@ export default function CreateAccount() {
     setFormData(prev => ({ ...prev, [name]: value }));
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
     const newErrors = {
@@ -41,8 +45,56 @@ export default function CreateAccount() {
       return;
     }
 
-    // Here you would typically make an API call to create the account
-    // For now, we'll just redirect to login
+    try {
+      // Validate email format
+      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+      if (!emailRegex.test(formData.email)) {
+        setErrors({
+          name: '',
+          email: 'E-mail inválido',
+          password: '',
+          confirmPassword: ''
+        });
+        return;
+      }
+
+      // Validate password strength (at least 6 characters)
+      if (formData.password.length < 6) {
+        setErrors({
+          name: '',
+          email: '',
+          password: 'Senha deve ter no mínimo 6 caracteres',
+          confirmPassword: ''
+        });
+        return;
+      }
+
+      // Create user in Firebase
+      await createUserWithEmailAndPassword(auth, formData.email, formData.password);
+      
+      // Store additional user data (name) in Firebase
+      // This would typically be stored in Firestore or Realtime Database
+      // For now, we'll just redirect to login
+      router.push('/login');
+    } catch (error: any) {
+      console.error('Account creation error:', error);
+      
+      if (error.code === 'auth/email-already-in-use') {
+        setErrors({
+          name: '',
+          email: 'E-mail já cadastrado',
+          password: '',
+          confirmPassword: ''
+        });
+      } else {
+        setErrors({
+          name: '',
+          email: '',
+          password: 'Erro ao criar conta',
+          confirmPassword: ''
+        });
+      }
+    }
   };
 
   return (
