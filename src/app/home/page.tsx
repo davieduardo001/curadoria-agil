@@ -1,9 +1,8 @@
 'use client';
 
-import Image from 'next/image';
-import Link from 'next/link';
 import { useAuth } from '@/contexts/AuthContext';
 import { useRouter } from 'next/navigation';
+import Navbar from '@/components/Navbar';
 
 export default function Home() {
   const { user, loading } = useAuth();
@@ -20,25 +19,7 @@ export default function Home() {
 
   return (
     <div className="min-h-screen bg-gray-100">
-      {/* Navbar Container */}
-      <div className="w-[1302px] mx-auto">
-        {/* Navbar */}
-        <nav className="bg-[#092C34] rounded-lg shadow-lg relative top-2">
-          <div className="h-[101px] flex-shrink-0">
-            <div className="flex justify-between h-full items-center px-6">
-              <div className="flex items-center">
-                <div className="flex-shrink-0 flex items-center">
-                  <span className="text-xl font-bold text-white">HOME</span>
-                </div>
-              </div>
-              
-              {/* Profile Dropdown */}
-
-            </div>
-          </div>
-        </nav>
-      </div>
-
+      <Navbar />
       {/* Main Content */}
       <main className="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">
         <div className="px-4 py-6 sm:px-0">
