@@ -1,7 +1,7 @@
 import Image from 'next/image';
 import Link from 'next/link';
 
-export default function Home() {
+export default function CreateAccount() {
   return (
     <main className="flex min-h-screen w-full items-center justify-center bg-[var(--primary)] p-4 lg:bg-[url('/images/background-login.png')] lg:bg-cover lg:bg-center lg:bg-no-repeat lg:justify-end lg:pr-16">
       <div className="relative flex h-[34.3rem] w-[54.5rem] shrink-0 overflow-hidden rounded-xl border-2 border-white/20">
@@ -26,9 +26,21 @@ export default function Home() {
           <div className="absolute inset-0 bg-[url('/images/form-bg.png')] bg-cover bg-center bg-no-repeat" />
           
           {/* Form content */}
-          <div className="relative w-full max-w-md p-8">
+          <div className="relative w-full max-w-md p-8 pb-12">
             {/* Add top margin to form to prevent logo overlap */}
             <form className="mt-16 space-y-6">
+              <div className="space-y-2">
+                <label htmlFor="name" className="block text-sm font-medium text-[var(--primary)]">
+                  Nome Completo
+                </label>
+                <input
+                  type="text"
+                  id="name"
+                  className="w-full rounded-sm border-2 border-[var(--primary)] bg-white py-2.5 pl-3 text-[var(--primary)] placeholder-gray-500 focus:outline-none focus:ring-1 focus:ring-[var(--primary)]"
+                  placeholder="Digite seu nome completo"
+                />
+              </div>
+
               <div className="space-y-2">
                 <label htmlFor="email" className="block text-sm font-medium text-[var(--primary)]">
                   E-mail
@@ -53,26 +65,31 @@ export default function Home() {
                 />
               </div>
 
+              <div className="space-y-2">
+                <label htmlFor="confirmPassword" className="block text-sm font-medium text-[var(--primary)]">
+                  Confirmar Senha
+                </label>
+                <input
+                  type="password"
+                  id="confirmPassword"
+                  className="w-full rounded-sm border-2 border-[var(--primary)] bg-white py-2.5 pl-3 text-[var(--primary)] placeholder-gray-500 focus:outline-none focus:ring-1 focus:ring-[var(--primary)]"
+                  placeholder="Confirme sua senha"
+                />
+              </div>
+
               <button
                 type="submit"
-                className="w-full rounded-sm border-2 border-[var(--primary)] bg-[var(--primary)] py-2.5 text-center text-white transition-colors hover:bg-[#0c3d47] focus:outline-none focus:ring-2 focus:ring-white/50 active:bg-[#071f24]"
+                className="w-full rounded-sm bg-[var(--primary)] py-3 text-center text-base font-medium text-white hover:bg-[var(--primary-dark)] focus:outline-none focus:ring-2 focus:ring-[var(--primary)] focus:ring-offset-2"
               >
-                Entrar
+                Criar Conta
               </button>
-
-              <label className="flex items-center space-x-2 pt-2">
-                <input
-                  type="checkbox"
-                  className="rounded-none border border-[var(--primary)] bg-white text-[var(--primary)] focus:ring-[var(--primary)]"
-                />
-                <span className="text-sm text-[var(--primary)]">Lembrar-me</span>
-              </label>
             </form>
+
             <div className="mt-6 text-center text-sm text-gray-500">
               <p>
-                Não tem uma conta?{' '}
-                <Link href="/create-account" className="text-[var(--primary)] hover:text-[var(--primary-dark)]">
-                  Criar Conta
+                Já tem uma conta?{' '}
+                <Link href="/" className="text-[var(--primary)] hover:text-[var(--primary-dark)]">
+                  Faça login
                 </Link>
               </p>
             </div>
