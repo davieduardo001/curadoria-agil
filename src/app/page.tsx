@@ -5,7 +5,8 @@ import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import FormInput from '@/components/FormInput';
 import Button from '@/components/Button';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import { useLocalStorage } from '@/hooks/useLocalStorage';
 import { auth } from '@/lib/firebase';
 import { signInWithEmailAndPassword } from 'firebase/auth';
 
@@ -14,6 +15,20 @@ export default function LoginPage() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [remember, setRemember] = useState(false);
+  const [rememberedUser, setRememberedUser] = useLocalStorage('rememberedUser', null);
+
+  useEffect(() => {
+    if (rememberedUser) {
+      const userData = rememberedUser;
+      // Only use stored credentials if they are less than 7 days old
+      if (Date.now() - userData.timestamp < 7 * 24 * 60 * 60 * 1000) {
+        setEmail(userData.email);
+        setPassword(userData.password);
+        setRemember(true);
+      }
+    }
+  }, [rememberedUser]);
+
   const [errors, setErrors] = useState({
     email: '',
     password: ''
@@ -26,6 +41,60 @@ export default function LoginPage() {
       email: email ? '' : 'E-mail obrigatório!',
       password: password ? '' : 'Senha obrigatória!'
     };
+
+    setErrors(newErrors);
+
+    if (newErrors.email || newErrors.password) {
+      return;
+    }
+
+    try {
+      // Validate email format
+      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+      if (!emailRegex.test(email)) {
+        setErrors({
+          email: 'E-mail inválido',
+          password: ''
+        });
+        return;
+      }
+
+      // Sign in with Firebase
+      await signInWithEmailAndPassword(auth, email, password);
+
+      // If remember is checked, store credentials
+      if (remember) {
+        setRememberedUser({
+          email,
+          password,
+          timestamp: Date.now()
+        });
+      } else {
+        setRememberedUser(null);
+      }
+
+      router.push('/home');
+    } catch (error: any) {
+      console.error('Login error:', error);
+      
+      // Handle specific Firebase Auth errors
+      if (error.code === 'auth/user-not-found' || error.code === 'auth/wrong-password') {
+        setErrors({
+          email: '',
+          password: 'E-mail ou senha incorretos'
+        });
+      } else if (error.code === 'auth/invalid-email') {
+        setErrors({
+          email: 'E-mail inválido',
+          password: ''
+        });
+      } else {
+        setErrors({
+          email: '',
+          password: 'Erro ao fazer login'
+        });
+      }
+    }
 
     setErrors(newErrors);
 
