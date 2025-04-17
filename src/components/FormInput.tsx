@@ -23,7 +23,7 @@ export default function FormInput({
       </label>
       <input
         {...props}
-        className={`w-full rounded-sm border-2 ${error ? 'border-red-500' : 'border-[var(--primary)]'} bg-white py-2.5 pl-3 text-[var(--primary)] placeholder-gray-500 focus:outline-none focus:ring-1 focus:ring-[var(--primary)] ${className}`}
+        className={`w-full rounded-sm border-2 ${error ? 'border-red-500' : 'border-[var(--primary)]'} bg-white py-1 pl-3 text-[var(--primary)] placeholder-gray-500 focus:outline-none focus:ring-1 focus:ring-[var(--primary)] ${className}`}
       />
       {error && (
         <p className="text-sm text-red-500">{error}</p>

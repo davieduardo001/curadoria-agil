@@ -4,6 +4,7 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import FormInput from '@/components/FormInput';
+import Button from '@/components/Button';
 import { useState } from 'react';
 import { auth } from '@/lib/firebase';
 import { signInWithEmailAndPassword } from 'firebase/auth';
@@ -117,21 +118,18 @@ export default function LoginPage() {
                 required
               />
 
-              <button
-                type="submit"
-                className="w-full rounded-sm bg-[var(--primary)] py-3 text-center text-base font-medium text-white hover:bg-[var(--primary-dark)] focus:outline-none focus:ring-2 focus:ring-[var(--primary)] focus:ring-offset-2"
-              >
+              <Button type="submit">
                 Entrar
-              </button>
+              </Button>
 
               <div>
                 <input
                   type="checkbox"
                   checked={remember}
                   onChange={(e) => setRemember(e.target.checked)}
-                  className="h-4 w-4 rounded border-gray-300 text-[var(--primary)] focus:ring-[var(--primary)]"
+                  className="rounded-none border border-[var(--primary)] bg-white text-[var(--primary)] focus:ring-[var(--primary)]"
                 />
-                <span className="text-sm text-gray-500">Lembrar-me</span>
+                <span className="text-sm text-[var(--primary)]">Lembrar-me</span>
               </div>
             </form>
             <div className="mt-6 text-center text-sm text-gray-500">

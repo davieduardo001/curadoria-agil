@@ -4,6 +4,7 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import FormInput from '@/components/FormInput';
+import Button from '@/components/Button';
 import { useState } from 'react';
 import { auth } from '@/lib/firebase';
 import { createUserWithEmailAndPassword } from 'firebase/auth';
@@ -75,7 +76,7 @@ export default function CreateAccount() {
       // Store additional user data (name) in Firebase
       // This would typically be stored in Firestore or Realtime Database
       // For now, we'll just redirect to login
-      router.push('/login');
+      router.push('/');
     } catch (error: any) {
       console.error('Account creation error:', error);
       
@@ -99,7 +100,7 @@ export default function CreateAccount() {
 
   return (
     <main className="flex min-h-screen w-full items-center justify-center bg-[var(--primary)] p-4 lg:bg-[url('/images/background-login.png')] lg:bg-cover lg:bg-center lg:bg-no-repeat lg:justify-end lg:pr-16">
-      <div className="relative flex h-[34.3rem] w-[54.5rem] shrink-0 overflow-hidden rounded-xl border-2 border-white/20">
+      <div className="relative flex h-[50rem] w-[60rem] shrink-0 overflow-hidden rounded-xl border-2 border-white/20">
         {/* Left side with blur */}
         <div className="relative hidden w-1/3 items-center justify-center bg-white/10 backdrop-blur-md shadow-lg lg:flex before:absolute before:inset-0 before:bg-gradient-to-b before:from-white/10 before:to-white/5 before:rounded-lg" />
 
@@ -115,15 +116,15 @@ export default function CreateAccount() {
           />
         </div>
 
-        {/* Right side - Form */}
-        <div className="relative flex w-full items-center justify-center lg:w-2/3">
-          {/* Form background */}
-          <div className="absolute inset-0 bg-[url('/images/form-bg.png')] bg-cover bg-center bg-no-repeat" />
-          
-          {/* Form content */}
-          <div className="relative w-full max-w-md p-8 pb-12">
-            {/* Add top margin to form to prevent logo overlap */}
-            <form onSubmit={handleSubmit} className="mt-16 space-y-6">
+        {/* Right side with form */}
+        <div className="relative w-[40rem] bg-white px-12 py-6 lg:px-16 lg:py-8">
+          <div className="space-y-8">
+            <div>
+              <h2 className="mt-6 text-center text-3xl font-bold text-[var(--primary)]">
+                Criar Conta
+              </h2>
+            </div>
+            <form onSubmit={handleSubmit} className="space-y-6">
               <FormInput
                 type="text"
                 id="name"
@@ -136,58 +137,55 @@ export default function CreateAccount() {
                 required
               />
 
-              <FormInput
-                type="email"
-                id="email"
-                name="email"
-                label="E-mail"
-                value={formData.email}
-                onChange={handleChange}
-                error={errors.email}
-                placeholder="Digite seu e-mail"
-                required
-              />
+                <FormInput
+                  type="email"
+                  id="email"
+                  name="email"
+                  label="E-mail"
+                  value={formData.email}
+                  onChange={handleChange}
+                  error={errors.email}
+                  placeholder="Digite seu e-mail"
+                  required
+                />
 
-              <FormInput
-                type="password"
-                id="password"
-                name="password"
-                label="Senha"
-                value={formData.password}
-                onChange={handleChange}
-                error={errors.password}
-                placeholder="Digite sua senha"
-                required
-              />
+                <FormInput
+                  type="password"
+                  id="password"
+                  name="password"
+                  label="Senha"
+                  value={formData.password}
+                  onChange={handleChange}
+                  error={errors.password}
+                  placeholder="Digite sua senha"
+                  required
+                />
 
-              <FormInput
-                type="password"
-                id="confirmPassword"
-                name="confirmPassword"
-                label="Confirmar Senha"
-                value={formData.confirmPassword}
-                onChange={handleChange}
-                error={errors.confirmPassword}
-                placeholder="Confirme sua senha"
-                required
-              />
+                <FormInput
+                  type="password"
+                  id="confirmPassword"
+                  name="confirmPassword"
+                  label="Confirmar Senha"
+                  value={formData.confirmPassword}
+                  onChange={handleChange}
+                  error={errors.confirmPassword}
+                  placeholder="Confirme sua senha"
+                  required
+                />
 
-              <button
-                type="submit"
-                className="w-full rounded-sm bg-[var(--primary)] py-3 text-center text-base font-medium text-white hover:bg-[var(--primary-dark)] focus:outline-none focus:ring-2 focus:ring-[var(--primary)] focus:ring-offset-2"
-              >
+              <Button type="submit">
                 Criar Conta
-              </button>
-            </form>
+              </Button>
 
-            <div className="mt-6 text-center text-sm text-gray-500">
-              <p>
-                Já tem uma conta?{' '}
-                <Link href="/" className="text-[var(--primary)] hover:text-[var(--primary-dark)]">
-                  Faça login
-                </Link>
-              </p>
-            </div>
+              <div className="mt-6 text-center text-sm text-gray-500">
+                <p>
+                  Já tem uma conta?{' '}
+                  <Link href="/" className="text-[var(--primary)] hover:text-[var(--primary-dark)]">
+                    Faça login
+                  </Link>
+                </p>
+              </div>
+            </form>
           </div>
         </div>
       </div>
