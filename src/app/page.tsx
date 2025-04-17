@@ -122,12 +122,12 @@ export default function LoginPage() {
                 Entrar
               </Button>
 
-              <div>
+              <div className="flex items-center space-x-3">
                 <input
                   type="checkbox"
                   checked={remember}
                   onChange={(e) => setRemember(e.target.checked)}
-                  className="rounded-none border border-[var(--primary)] bg-white text-[var(--primary)] focus:ring-[var(--primary)]"
+                  className="rounded-none border border-[var(--primary)] bg-white text-[var(--primary)] focus:ring-[var(--primary)] focus:ring-2"
                 />
                 <span className="text-sm text-[var(--primary)]">Lembrar-me</span>
               </div>
