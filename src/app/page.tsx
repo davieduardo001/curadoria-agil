@@ -5,6 +5,8 @@ import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import FormInput from '@/components/FormInput';
 import { useState } from 'react';
+import { auth } from '@/lib/firebase';
+import { signInWithEmailAndPassword } from 'firebase/auth';
 
 export default function LoginPage() {
   const router = useRouter();
@@ -30,11 +32,40 @@ export default function LoginPage() {
       return;
     }
 
-    // Here you would typically make an API call to authenticate the user
-    // For now, we'll just simulate a successful login
-    // Here you would typically make an API call to authenticate the user
-    // For now, we'll just simulate a successful login
-    router.push('/home');
+    try {
+      // Validate email format
+      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+      if (!emailRegex.test(email)) {
+        setErrors({
+          email: 'E-mail inválido',
+          password: ''
+        });
+        return;
+      }
+
+      await signInWithEmailAndPassword(auth, email, password);
+      router.push('/home');
+    } catch (error: any) {
+      console.error('Login error:', error);
+      
+      // Handle specific Firebase Auth errors
+      if (error.code === 'auth/user-not-found' || error.code === 'auth/wrong-password') {
+        setErrors({
+          email: '',
+          password: 'E-mail ou senha incorretos'
+        });
+      } else if (error.code === 'auth/invalid-email') {
+        setErrors({
+          email: 'E-mail inválido',
+          password: ''
+        });
+      } else {
+        setErrors({
+          email: '',
+          password: 'Erro ao fazer login'
+        });
+      }
+    }
   };
 
   return (

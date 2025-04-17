@@ -1,7 +1,23 @@
+'use client';
+
 import Image from 'next/image';
 import Link from 'next/link';
+import { useAuth } from '@/contexts/AuthContext';
+import { useRouter } from 'next/navigation';
 
 export default function Home() {
+  const { user, loading } = useAuth();
+  const router = useRouter();
+
+  if (loading) {
+    return <div className="min-h-screen flex items-center justify-center">Carregando...</div>;
+  }
+
+  if (!user) {
+    router.push('/');
+    return null;
+  }
+
   return (
     <div className="min-h-screen bg-gray-100">
       {/* Navbar Container */}
