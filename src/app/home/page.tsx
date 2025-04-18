@@ -22,7 +22,7 @@ export default function Home() {
   useEffect(() => {
     const fetchProjects = async () => {
       try {
-        const q = query(collection(db, 'projetos'));
+        const q = query(collection(db, 'contratos'));
         const querySnapshot = await getDocs(q);
         const projectsData = querySnapshot.docs.map(doc => ({
           id: doc.id,
