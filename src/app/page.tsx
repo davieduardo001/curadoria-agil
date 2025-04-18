@@ -4,7 +4,6 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import FormInput from '@/components/FormInput';
-import Button from '@/components/Button';
 import Toast from '@/components/Toast';
 import EmailNotFoundToast from '@/components/EmailNotFoundToast';
 import { useState, useEffect } from 'react';
@@ -129,7 +128,7 @@ export default function LoginPage() {
       )}
       <main className="flex min-h-screen w-full items-center justify-center bg-[var(--primary)] p-4 lg:bg-[url('/images/background-login.png')] lg:bg-cover lg:bg-center lg:bg-no-repeat lg:justify-end lg:pr-16">
         <div className="relative flex h-[34.3rem] w-[54.5rem] shrink-0 overflow-hidden rounded-xl border-2 border-white/20">
-          {/* Left side with blur */}
+          {/* Left side */}
           <div className="relative hidden w-1/3 items-center justify-center bg-white/10 backdrop-blur-md shadow-lg lg:flex before:absolute before:inset-0 before:bg-gradient-to-b before:from-white/10 before:to-white/5 before:rounded-lg" />
 
           {/* Logo overlapping both sections */}
@@ -182,7 +181,7 @@ export default function LoginPage() {
                       type="checkbox"
                       checked={remember}
                       onChange={(e) => setRemember(e.target.checked)}
-                      className="h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+                      className="h-4 w-4 rounded border-[var(--primary)] text-[var(--primary)] focus:ring-[var(--primary)]"
                     />
                     <label
                       htmlFor="remember"
@@ -193,19 +192,19 @@ export default function LoginPage() {
                   </div>
                 </div>
 
-                <Button
+                <button
                   type="submit"
-                  className="w-full"
+                  className="w-full bg-[#031617] text-white py-3 px-4 rounded-lg hover:rounded-none transition-all duration-300 hover:bg-[#042224]"
                 >
                   Entrar
-                </Button>
+                </button>
 
                 <div className="text-center">
                   <Link
                     href="/create-account"
-                    className="text-sm text-blue-600 hover:text-blue-500"
+                    className="text-sm"
                   >
-                    Não tem uma conta? Cadastre-se
+                    <span className="text-[var(--primary)]">Não tem uma conta?</span> <span className="text-blue-600 hover:text-blue-500">Cadastre-se</span>
                   </Link>
                 </div>
               </form>

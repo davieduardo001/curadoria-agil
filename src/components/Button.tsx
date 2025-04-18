@@ -20,7 +20,7 @@ export default function Button({
       type={type}
       onClick={onClick}
       disabled={disabled}
-      className={`w-full rounded-sm bg-[var(--primary)] py-3 text-center text-base font-medium text-white hover:bg-[var(--primary-dark)] focus:outline-none focus:ring-2 focus:ring-[var(--primary)] focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed ${className}`}
+      className={`w-full rounded-lg bg-[var(--primary)] py-3 text-center text-base font-medium text-white hover:bg-[var(--primary-dark)] hover:rounded-none transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-[var(--primary)] focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed ${className}`}
     >
       {children}
     </button>

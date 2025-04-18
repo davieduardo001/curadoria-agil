@@ -173,17 +173,19 @@ export default function CreateAccount() {
                   required
                 />
 
-              <Button type="submit">
+              <button
+                type="submit"
+                className="w-full bg-[#031617] text-white py-3 px-4 rounded-lg hover:rounded-none transition-all duration-300 hover:bg-[#042224]"
+              >
                 Criar Conta
-              </Button>
+              </button>
 
               <div className="mt-6 text-center text-sm text-gray-500">
-                <p>
-                  Já tem uma conta?{' '}
-                  <Link href="/" className="text-[var(--primary)] hover:text-[var(--primary-dark)]">
-                    Faça login
-                  </Link>
-                </p>
+                <Link href="/" className="inline-block">
+                  <p>
+                    <span className="text-[var(--primary)]">Já tem uma conta?</span> <span className="text-blue-600 hover:text-blue-500">Faça login</span>
+                  </p>
+                </Link>
               </div>
             </form>
           </div>
