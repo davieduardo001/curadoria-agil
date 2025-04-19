@@ -1,7 +1,7 @@
 'use client';
 
-import { useEffect } from 'react';
-import { useParams } from 'next/navigation';
+import { useEffect, useState } from 'react';
+import { useParams, useRouter } from 'next/navigation';
 import { useAuth } from '@/contexts/AuthContext';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faPenToSquare } from '@fortawesome/free-solid-svg-icons';
@@ -9,11 +9,15 @@ import Navbar from '@/components/Navbar';
 import ProjectForm from '@/components/ProjectForm';
 import Stepper from '@/components/Stepper';
 import FormContainer from '@/components/FormContainer';
+import SprintForm from '@/components/SprintForm';
 
 export default function NewProjectPage() {
   const { user, loading } = useAuth();
   const params = useParams();
+  const router = useRouter();
   const contractId = params.id as string;
+  const [currentStep, setCurrentStep] = useState(1);
+  const [projectId, setProjectId] = useState<string | null>(null);
 
   useEffect(() => {
     if (!loading && !user) {
@@ -29,6 +33,26 @@ export default function NewProjectPage() {
     return null;
   }
 
+  const handleProjectSaved = (id: string) => {
+    setProjectId(id);
+    setCurrentStep(2);
+  };
+
+  const handleBack = () => {
+    setCurrentStep(1);
+  };
+
+  const steps = [
+    {
+      title: 'Projeto',
+      icon: <FontAwesomeIcon icon={faPenToSquare} className="w-4 h-4" />
+    },
+    {
+      title: 'Sprint',
+      icon: <FontAwesomeIcon icon={faPenToSquare} className="w-4 h-4" />
+    }
+  ];
+
   return (
     <div className="min-h-screen bg-gray-100">
       <Navbar />
@@ -42,26 +66,28 @@ export default function NewProjectPage() {
           
           <div className="mt-8">
             <Stepper
-              steps={[
-                {
-                  title: 'Projeto',
-                  icon: <FontAwesomeIcon icon={faPenToSquare} className="w-4 h-4" />
-                },
-                {
-                  title: 'Sprint',
-                  icon: <FontAwesomeIcon icon={faPenToSquare} className="w-4 h-4" />
-                }
-              ]}
-              currentStep={1}
+              steps={steps}
+              currentStep={currentStep}
             />
           </div>
 
           <div className="mt-8">
             <FormContainer
-              title="Dados do Projeto"
+              title={currentStep === 1 ? "Dados do Projeto" : "Dados da Sprint"}
             >
               <div className="border-b border-gray-300 mb-6"></div>
-              <ProjectForm contractId={contractId} />
+              {currentStep === 1 ? (
+              <ProjectForm 
+                contractId={contractId} 
+                onProjectSaved={handleProjectSaved}
+              />
+            ) : (
+              <SprintForm 
+                projectId={projectId!} 
+                onBack={handleBack}
+                onSprintSaved={() => router.push(`/contrato/${contractId}`)}
+              />
+            )}
             </FormContainer>
           </div>
         </div>
