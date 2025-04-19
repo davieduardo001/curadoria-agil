@@ -4,7 +4,7 @@ import { useParams } from 'next/navigation';
 import SecondaryButton from '@/components/SecondaryButton';
 import { useAuth } from '@/contexts/AuthContext';
 import Navbar from '@/components/Navbar';
-import ProjectCard from '@/components/ProjectCard';
+import ProjectTable from '@/components/ProjectTable';
 import { collection, query, where, getDocs, doc, getDoc } from 'firebase/firestore';
 import { db } from '@/lib/firebase';
 import { useEffect, useState } from 'react';
@@ -113,9 +113,16 @@ export default function ContractPage() {
                   </div>
                 ) : (
                   <div className="space-y-4">
-                    {projects.map((project) => (
-                      <ProjectCard key={project.id} project={project} />
-                    ))}
+                    <ProjectTable
+                      projects={projects.map(project => ({
+                        titulo: project.title,
+                        dataInicio: project.startDate,
+                        dataFim: project.endDate,
+                        sprintAtual: 'Sprint 1',
+                        horarioDaily: '10:00',
+                        status: 'Em andamento'
+                      }))}
+                    />
                   </div>
                 )}
               </div>
