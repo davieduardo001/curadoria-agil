@@ -1,17 +1,31 @@
 'use client';
 
 import { useParams } from 'next/navigation';
+import SecondaryButton from '@/components/SecondaryButton';
 import { useAuth } from '@/contexts/AuthContext';
 import Navbar from '@/components/Navbar';
-import { useEffect, useState } from 'react';
-import { doc, getDoc } from 'firebase/firestore';
+import ProjectCard from '@/components/ProjectCard';
+import { collection, query, where, getDocs, doc, getDoc } from 'firebase/firestore';
 import { db } from '@/lib/firebase';
+import { useEffect, useState } from 'react';
+
+interface Project {
+  id: string;
+  title: string;
+  description: string;
+  startDate: string;
+  endDate: string;
+  createdAt: string;
+  updatedAt: string;
+}
 
 export default function ContractPage() {
   const { id } = useParams();
-  const { user, loading } = useAuth();
   const [contract, setContract] = useState<any>(null);
   const [loadingContract, setLoadingContract] = useState(true);
+  const [projects, setProjects] = useState<Project[]>([]);
+  const [loadingProjects, setLoadingProjects] = useState(true);
+  const { user, loading } = useAuth();
 
   useEffect(() => {
     if (!loading && !user) {
@@ -22,12 +36,9 @@ export default function ContractPage() {
   useEffect(() => {
     const fetchContract = async () => {
       try {
-        const docRef = doc(db, 'contratos', id as string);
-        const docSnap = await getDoc(docRef);
-        
-        if (docSnap.exists()) {
-          setContract(docSnap.data());
-        }
+        const contractRef = doc(db, 'contratos', id as string);
+        const contractSnap = await getDoc(contractRef);
+        setContract(contractSnap.data());
       } catch (error) {
         console.error('Error fetching contract:', error);
       } finally {
@@ -35,7 +46,36 @@ export default function ContractPage() {
       }
     };
 
+    const fetchProjects = async () => {
+      try {
+        const contractRef = doc(db, 'contratos', id as string);
+        const q = query(
+          collection(db, 'projetos'),
+          where('parent', '==', contractRef)
+        );
+        const querySnapshot = await getDocs(q);
+        const projectsData = querySnapshot.docs.map(doc => {
+          const data = doc.data();
+          return {
+            id: doc.id,
+            title: data.title,
+            description: data.description,
+            startDate: data.startDate,
+            endDate: data.endDate,
+            createdAt: data.createdAt,
+            updatedAt: data.updatedAt
+          };
+        });
+        setProjects(projectsData);
+      } catch (error) {
+        console.error('Error fetching projects:', error);
+      } finally {
+        setLoadingProjects(false);
+      }
+    };
+
     fetchContract();
+    fetchProjects();
   }, [id]);
 
   if (loading) {
@@ -53,13 +93,33 @@ export default function ContractPage() {
       <main className="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">
         <div className="px-4 py-6 sm:px-0">
           <div className="text-left">
-            <div className="flex items-center gap-4">
-              <div className="w-12 h-12 bg-pink-500 rounded-lg"></div>
-              <div>
-                <h1 className="text-4xl font-bold text-gray-900">Bem vindo ao Contrato: {loadingContract ? 'Carregando...' : contract?.title}</h1>
-                <p className="mt-4 text-gray-600">Gerencie e refine suas atividades com agilidade. Explore as opções e mantenha o fluxo de trabalho sempre otimizado!</p>
+            <div className="text-left">
+              <h1 className="text-4xl font-bold text-gray-900">Projetos {loadingContract ? 'Carregando...' : contract?.title}</h1>
+              <p className="mt-4 text-gray-600">Consulte a listagem de demandas da {loadingContract ? 'Carregando...' : contract?.title} para visualizar e acompanhar os projetos e atividades em desenvolvimento.</p>
+              <div className="flex justify-end">
+                <SecondaryButton onClick={() => window.location.href = `/contrato/${id}/novo`}>
+                  Cadastrar Projeto
+                </SecondaryButton>
               </div>
             </div>
+
+            {loadingProjects ? (
+              <div className="mt-8 text-center">Carregando projetos...</div>
+            ) : (
+              <div className="mt-8">
+                {projects.length === 0 ? (
+                  <div className="text-center text-gray-500 py-8">
+                    Nenhum projeto cadastrado ainda
+                  </div>
+                ) : (
+                  <div className="space-y-4">
+                    {projects.map((project) => (
+                      <ProjectCard key={project.id} project={project} />
+                    ))}
+                  </div>
+                )}
+              </div>
+            )}
           </div>
         </div>
       </main>
