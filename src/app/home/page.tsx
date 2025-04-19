@@ -8,6 +8,8 @@ import ContractForm from '@/components/ContractForm';
 import { collection, query, getDocs } from 'firebase/firestore';
 import Link from 'next/link';
 import { db } from '@/lib/firebase';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faPenToSquare } from '@fortawesome/free-solid-svg-icons';
 
 export default function Home() {
   const { user, loading } = useAuth();
@@ -15,6 +17,7 @@ export default function Home() {
   const [projects, setProjects] = useState<any[]>([]);
   const [loadingProjects, setLoadingProjects] = useState(true);
   const [showForm, setShowForm] = useState(false);
+  const [selectedProject, setSelectedProject] = useState<any | null>(null);
 
   const fetchProjects = async () => {
     try {
@@ -34,13 +37,17 @@ export default function Home() {
 
   const handleCreateContract = () => {
     setShowForm(true);
+    setSelectedProject(null);
   };
 
   const handleCloseForm = () => {
     setShowForm(false);
   };
 
-
+  const handleEditContract = (project: any) => {
+    setShowForm(true);
+    setSelectedProject(project);
+  };
 
   const handleRefetchProjects = () => {
     fetchProjects();
@@ -71,6 +78,7 @@ export default function Home() {
         <ContractForm
           onClose={handleCloseForm}
           refetchProjects={handleRefetchProjects}
+          project={selectedProject}
         />
       )}
       
@@ -109,6 +117,18 @@ export default function Home() {
                         <h2 className="text-[#031617] font-lato text-2xl font-bold leading-[32px]">
                           {project.title}
                         </h2>
+                        <div className="flex items-center gap-4">
+                        <button
+                          onClick={(e) => {
+                            e.preventDefault();
+                            e.stopPropagation();
+                            handleEditContract(project);
+                          }}
+                          className="p-0.5 hover:bg-gray-100 rounded-full transition-colors"
+                          title="Editar"
+                        >
+                          <FontAwesomeIcon icon={faPenToSquare} className="w-4 h-4 text-[#031617]" />
+                        </button>
                         <Link
                           href={`/contrato/${project.id}`}
                           className="p-0.5 hover:bg-gray-100 rounded-full transition-colors"
@@ -128,6 +148,8 @@ export default function Home() {
                           </svg>
                         </Link>
                       </div>
+                      </div>
+                      
                       <div className="flex flex-col gap-2">
                         <p className="text-[#031617] font-lato text-base leading-[20px]">
                           {project.text}

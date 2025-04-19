@@ -1,20 +1,31 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import FormInput from './FormInput';
 import FormTextarea from './FormTextarea';
-import { collection, addDoc } from 'firebase/firestore';
+import { collection, addDoc, updateDoc, doc, deleteDoc } from 'firebase/firestore';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faTrash } from '@fortawesome/free-solid-svg-icons';
 import { db } from '@/lib/firebase';
 
 interface ContractFormProps {
   onClose: () => void;
   refetchProjects: () => void;
+  project?: any;
 }
 
-export default function ContractForm({ onClose, refetchProjects }: ContractFormProps) {
+export default function ContractForm({ onClose, refetchProjects, project }: ContractFormProps) {
   const [title, setTitle] = useState('');
   const [text, setText] = useState('');
   const [color, setColor] = useState('#ffffff');
+
+  useEffect(() => {
+    if (project) {
+      setTitle(project.title);
+      setText(project.text);
+      setColor(project.color || '#ffffff');
+    }
+  }, [project]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
 
@@ -27,17 +38,28 @@ export default function ContractForm({ onClose, refetchProjects }: ContractFormP
 
     setLoading(true);
     try {
-      await addDoc(collection(db, 'contratos'), {
-        title,
-        text,
-        color,
-        createdAt: new Date().toISOString(),
-      });
+      if (project) {
+        // Update existing contract
+        await updateDoc(doc(db, 'contratos', project.id), {
+          title,
+          text,
+          color,
+          updatedAt: new Date().toISOString(),
+        });
+      } else {
+        // Create new contract
+        await addDoc(collection(db, 'contratos'), {
+          title,
+          text,
+          color,
+          createdAt: new Date().toISOString(),
+        });
+      }
       onClose();
       refetchProjects();
-    } catch (err) {
-      setError('Erro ao criar contrato');
-      console.error('Error creating contract:', err);
+    } catch (error) {
+      setError('Erro ao salvar contrato');
+      console.error('Error saving contract:', error);
     } finally {
       setLoading(false);
     }
@@ -85,13 +107,40 @@ export default function ContractForm({ onClose, refetchProjects }: ContractFormP
                 type="color"
                 value={color}
                 onChange={(e) => setColor(e.target.value)}
-                className="h-8 w-8 rounded-full cursor-pointer"
+                className="w-8 h-8 rounded"
               />
-              <div className="w-8 h-8 rounded-full" style={{ backgroundColor: color }}></div>
+              <input
+                type="text"
+                value={color}
+                onChange={(e) => setColor(e.target.value)}
+                className="border rounded px-2 py-1"
+              />
             </div>
           </div>
-
           <div className="flex justify-end space-x-2">
+            {project && (
+              <button
+                onClick={async (e) => {
+                  e.preventDefault();
+                  if (!confirm('Tem certeza que deseja excluir este contrato?')) {
+                    return;
+                  }
+                  try {
+                    await deleteDoc(doc(db, 'contratos', project.id));
+                    onClose();
+                    refetchProjects();
+                  } catch (error) {
+                    setError('Erro ao excluir contrato');
+                    console.error('Error deleting contract:', error);
+                  }
+                }}
+                className="px-4 py-2 bg-red-500 text-white rounded hover:bg-red-600 flex items-center gap-2"
+                title="Excluir Contrato"
+              >
+                <FontAwesomeIcon icon={faTrash} className="w-4 h-4" />
+                Excluir
+              </button>
+            )}
             <button
               onClick={onClose}
               className="px-4 py-2 bg-gray-200 text-gray-700 rounded hover:bg-gray-300"
@@ -104,7 +153,7 @@ export default function ContractForm({ onClose, refetchProjects }: ContractFormP
               disabled={loading}
               className="px-4 py-2 bg-[#031617] text-white rounded hover:bg-[#031617]/90 disabled:opacity-50 disabled:cursor-not-allowed"
             >
-              {loading ? 'Criando...' : 'Criar Contrato'}
+              {project ? (loading ? 'Editando...' : 'Editar') : (loading ? 'Criando...' : 'Criar Contrato')}
             </button>
           </div>
         </form>
