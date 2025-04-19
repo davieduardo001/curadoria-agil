@@ -8,6 +8,7 @@ import { faPenToSquare } from '@fortawesome/free-solid-svg-icons';
 import Navbar from '@/components/Navbar';
 import ProjectForm from '@/components/ProjectForm';
 import Stepper from '@/components/Stepper';
+import FormContainer from '@/components/FormContainer';
 
 export default function NewProjectPage() {
   const { user, loading } = useAuth();
@@ -56,7 +57,12 @@ export default function NewProjectPage() {
           </div>
 
           <div className="mt-8">
-            <ProjectForm contractId={contractId} />
+            <FormContainer
+              title="Dados do Projeto"
+            >
+              <div className="border-b border-gray-300 mb-6"></div>
+              <ProjectForm contractId={contractId} />
+            </FormContainer>
           </div>
         </div>
       </main>

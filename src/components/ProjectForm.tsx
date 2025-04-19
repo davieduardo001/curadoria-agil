@@ -1,125 +1,132 @@
 'use client';
 
 import { useState } from 'react';
-import FormInput from './FormInput';
-import FormTextarea from './FormTextarea';
 import { collection, addDoc, doc } from 'firebase/firestore';
 import { db } from '@/lib/firebase';
 import { useParams } from 'next/navigation';
 import { useAuth } from '@/contexts/AuthContext';
 import { useRouter } from 'next/navigation';
+import { ChangeEvent, FormEvent } from 'react';
+import StyledFormInput from './StyledFormInput';
+import SecondaryButton from './SecondaryButton';
+import PrimaryButton from './PrimaryButton';
 
 interface ProjectFormProps {
-  onClose?: () => void;
   contractId?: string;
 }
 
-export default function ProjectForm({ onClose, contractId }: ProjectFormProps) {
-  const { user } = useAuth();
-  const router = useRouter();
+export default function ProjectForm({ contractId }: ProjectFormProps) {
   const [title, setTitle] = useState('');
-  const [description, setDescription] = useState('');
   const [startDate, setStartDate] = useState('');
   const [endDate, setEndDate] = useState('');
-  const [loading, setLoading] = useState(false);
+  const [status, setStatus] = useState('Novo');
+  const [dailyTime, setDailyTime] = useState('');
   const [error, setError] = useState('');
+  const [loading, setLoading] = useState(false);
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const { user } = useAuth();
+  const router = useRouter();
+
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    if (!title.trim() || !description.trim() || !startDate.trim() || !endDate.trim()) {
+    if (!title.trim() || !startDate.trim() || !endDate.trim() || !status.trim() || !dailyTime.trim()) {
       setError('Por favor, preencha todos os campos');
       return;
     }
 
-    if (!contractId) {
-      setError('Não foi possível identificar o contrato associado');
-      return;
-    }
-
     setLoading(true);
+    setError('');
+
     try {
-      await addDoc(collection(db, 'projetos'), {
+      await addDoc(collection(db, 'projects'), {
         title,
-        description,
-        startDate: new Date(startDate).toISOString(),
-        endDate: new Date(endDate).toISOString(),
-        parent: doc(db, 'contratos', contractId),
-        userId: user?.uid,
+        startDate,
+        endDate,
+        status,
+        dailyTime,
+        contractId,
         createdAt: new Date().toISOString(),
-        updatedAt: new Date().toISOString(),
+        createdBy: user?.email || 'anonymous',
       });
-      
-      if (contractId) {
-        router.push(`/contrato/${contractId}`);
-      } else if (onClose) {
-        onClose();
-      }
-    } catch (error) {
+
+      router.push(`/contrato/${contractId}`);
+    } catch (err) {
       setError('Erro ao salvar projeto');
-      console.error('Error saving project:', error);
+      console.error('Erro ao salvar projeto:', err);
     } finally {
       setLoading(false);
     }
   };
 
   return (
-    <div className="max-w-2xl mx-auto">
+    <div className="w-full">
       <form onSubmit={handleSubmit} className="space-y-6">
-        {error && (
-          <div className="bg-red-50 text-red-500 p-3 rounded">
-            {error}
+        <div className="space-y-6">
+          {error && (
+            <div className="bg-red-50 text-red-500 p-3 rounded">
+              {error}
+            </div>
+          )}
+
+          <div className="w-full">
+            <StyledFormInput
+              label="Nome do Projeto"
+              type="text"
+              value={title}
+              onChange={setTitle}
+              required
+              className="w-full"
+            />
           </div>
-        )}
 
-        <FormInput
-          label="Título"
-          value={title}
-          onChange={(e) => setTitle(e.target.value)}
-          required
-        />
+          <div className="grid grid-cols-2 gap-6 w-full">
+            <StyledFormInput
+              label="Status"
+              type="select"
+              value={status}
+              onChange={setStatus}
+              required
+            />
 
-        <FormTextarea
-          label="Descrição"
-          value={description}
-          onChange={(e) => setDescription(e.target.value)}
-          required
-        />
+            <StyledFormInput
+              label="Data Início"
+              type="date"
+              value={startDate}
+              onChange={setStartDate}
+              required
+            />
 
-        <div className="grid grid-cols-2 gap-4">
-          <FormInput
-            label="Data Início"
-            type="date"
-            value={startDate}
-            onChange={(e) => setStartDate(e.target.value)}
-            required
-          />
-          
-          <FormInput
-            label="Data Fim"
-            type="date"
-            value={endDate}
-            onChange={(e) => setEndDate(e.target.value)}
-            required
-          />
+            <StyledFormInput
+              label="Data Fim"
+              type="date"
+              value={endDate}
+              onChange={setEndDate}
+              required
+            />
+
+            <StyledFormInput
+              label="Horário Daily"
+              type="time"
+              value={dailyTime}
+              onChange={setDailyTime}
+              required
+            />
+          </div>
         </div>
 
-        <div className="flex justify-end space-x-4">
-          {onClose && (
-            <button
-              onClick={onClose}
-              className="px-4 py-2 bg-gray-200 text-gray-700 rounded hover:bg-gray-300"
-              type="button"
-            >
-              Cancelar
-            </button>
-          )}
-          <button
+        <div className="flex justify-end gap-4">
+          <PrimaryButton
+            type="button"
+            onClick={() => router.push(`/contrato/${contractId}`)}
+          >
+            Cancelar
+          </PrimaryButton>
+          <SecondaryButton
             type="submit"
             disabled={loading}
-            className="px-4 py-2 bg-[#18AAB0] text-white rounded-lg border border-[#3ECBD0] hover:bg-[#18AAB0]/90 transition-all duration-300 hover:rounded-none focus:outline-none focus:ring-2 focus:ring-[#3ECBD0] focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed"
           >
-            {loading ? 'Cadastrando...' : 'Cadastrar'}
-          </button>
+            {loading ? 'Salvando...' : 'Salvar'}
+          </SecondaryButton>
         </div>
       </form>
     </div>
