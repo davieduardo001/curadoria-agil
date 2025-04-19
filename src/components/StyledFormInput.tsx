@@ -24,7 +24,7 @@ export default function StyledFormInput({
   return (
     <div className="w-full">
       <label 
-        className="block text-[#031617] font-lato font-bold text-sm mb-2 flex items-center gap-1"
+        className="text-[#031617] font-lato font-bold text-sm mb-2 flex items-center gap-1"
         htmlFor={label.toLowerCase().replace(/\s+/g, '-')}
       >
         {label}
