@@ -53,12 +53,12 @@ export default function Home() {
       <Navbar />
       {/* Main Content */}
       <main className="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">
-        <div className="px-4 py-6 sm:px-0">
+        <div className="px-1 py-6 sm:px-0">
           <div className="text-left">
             <h1 className="text-4xl font-bold text-gray-900">Curadoria Agil</h1>
             <p className="mt-4 text-gray-600">Gerencie e refine suas atividades com agilidade. Explore as opções e mantenha o fluxo de trabalho sempre otimizado!</p>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-8 w-full">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mt-8 w-full">
               {loadingProjects ? (
                 <div key="loading" className="w-[452px] h-[247px] bg-white rounded-lg shadow-md p-6 relative overflow-hidden">
                   <div className="flex flex-col gap-4">
@@ -88,8 +88,8 @@ export default function Home() {
                         </p>
                       </div>
                     </div>
-                    <div className="absolute left-0 top-0 h-full w-1 bg-[#031617] rounded-l-lg" />
-                    <div className="absolute right-4 top-1/2 -translate-y-1/2">
+                    <div className="absolute left-0 top-0 h-full w-2 bg-[#031617] rounded-l-lg" />
+                    <div className="absolute right-4 top-6">
                       <svg
                         className="w-6 h-6 text-[#031617]"
                         fill="none"
