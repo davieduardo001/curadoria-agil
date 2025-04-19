@@ -1,7 +1,11 @@
 'use client';
 
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faPenToSquare } from '@fortawesome/free-solid-svg-icons';
+
 interface Step {
   title: string;
+  icon?: React.ReactNode;
 }
 
 interface StepperProps {
@@ -16,7 +20,7 @@ export default function Stepper({ steps, currentStep }: StepperProps) {
         {steps.map((step, index) => (
           <div key={index} className="flex flex-col items-center">
             <div className={`w-8 h-8 flex items-center justify-center rounded-full ${currentStep >= index + 1 ? 'bg-[#18AAB0] text-white' : 'bg-gray-200 text-gray-500'}`}>
-              <span className="text-sm">{index + 1}</span>
+              {step.icon || <FontAwesomeIcon icon={faPenToSquare} className="w-4 h-4" />}
             </div>
             <div className="mt-2">
               <span className={`text-sm font-medium ${currentStep >= index + 1 ? 'text-[#18AAB0]' : 'text-gray-500'}`}>

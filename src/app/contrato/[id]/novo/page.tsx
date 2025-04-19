@@ -3,6 +3,8 @@
 import { useEffect } from 'react';
 import { useParams } from 'next/navigation';
 import { useAuth } from '@/contexts/AuthContext';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faPenToSquare } from '@fortawesome/free-solid-svg-icons';
 import Navbar from '@/components/Navbar';
 import ProjectForm from '@/components/ProjectForm';
 import Stepper from '@/components/Stepper';
@@ -42,19 +44,11 @@ export default function NewProjectPage() {
               steps={[
                 {
                   title: 'Projeto',
-                  icon: (
-                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14.828 14.828a4 4 0 01-5.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                    </svg>
-                  )
+                  icon: <FontAwesomeIcon icon={faPenToSquare} className="w-4 h-4" />
                 },
                 {
                   title: 'Sprint',
-                  icon: (
-                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14.828 14.828a4 4 0 01-5.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                    </svg>
-                  )
+                  icon: <FontAwesomeIcon icon={faPenToSquare} className="w-4 h-4" />
                 }
               ]}
               currentStep={1}
