@@ -77,7 +77,7 @@ export default function ContractForm({ onClose, refetchProjects, project }: Cont
           </svg>
         </button>
 
-        <h2 className="text-2xl font-bold mb-4">Novo Contrato</h2>
+        <h2 className="text-2xl font-bold mb-4">{project ? 'Editando Contrato' : 'Novo Contrato'}</h2>
 
         {error && (
           <div className="bg-red-50 text-red-500 p-3 rounded mb-4">
