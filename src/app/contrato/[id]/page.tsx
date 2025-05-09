@@ -5,7 +5,7 @@ import SecondaryButton from '@/components/SecondaryButton';
 import { useAuth } from '@/contexts/AuthContext';
 import Navbar from '@/components/Navbar';
 import ProjectTable from '@/components/ProjectTable';
-import { collection, query, where, getDocs, doc, getDoc } from 'firebase/firestore';
+import { collection, query, where, getDocs, doc, getDoc, deleteDoc } from 'firebase/firestore';
 import { db } from '@/lib/firebase';
 import { useEffect, useState } from 'react';
 
@@ -26,6 +26,7 @@ export default function ContractPage() {
   const [contract, setContract] = useState<any>(null);
   const [loadingContract, setLoadingContract] = useState(true);
   const [projects, setProjects] = useState<Project[]>([]);
+  const [deletingProject, setDeletingProject] = useState<string | null>(null);
   const [loadingProjects, setLoadingProjects] = useState(true);
   const { user, loading } = useAuth();
 
@@ -34,6 +35,18 @@ export default function ContractPage() {
       window.location.href = '/';
     }
   }, [user, loading]);
+
+  const handleDeleteProject = async (projectId: string) => {
+    try {
+      setDeletingProject(projectId);
+      await deleteDoc(doc(db, 'projetos', projectId));
+      setProjects(projects.filter(project => project.id !== projectId));
+    } catch (error) {
+      console.error('Error deleting project:', error);
+    } finally {
+      setDeletingProject(null);
+    }
+  };
 
   useEffect(() => {
     const fetchContract = async () => {
@@ -115,7 +128,10 @@ export default function ContractPage() {
                       Nenhum projeto cadastrado ainda
                     </div>
                   ) : (
-                    <ProjectTable projects={projects} />
+                    <ProjectTable 
+                      projects={projects} 
+                      onDelete={handleDeleteProject}
+                    />
                   )}
                 </div>
               )}

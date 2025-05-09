@@ -1,5 +1,8 @@
 'use client';
 
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faTrash } from '@fortawesome/free-solid-svg-icons';
+
 interface ProjectTableProps {
   projects: Array<{
     id: string;
@@ -17,6 +20,7 @@ interface ProjectTableProps {
     status?: string;
     dailyTime?: string;
   }>;
+  onDelete: (id: string) => void;
 }
 
 function getProjectData(project: ProjectTableProps['projects'][0]) {
@@ -29,7 +33,7 @@ function getProjectData(project: ProjectTableProps['projects'][0]) {
   };
 }
 
-export default function ProjectTable({ projects }: ProjectTableProps) {
+export default function ProjectTable({ projects, onDelete }: ProjectTableProps) {
   return (
     <div className="overflow-x-auto">
       <table className="min-w-full rounded-lg">
@@ -49,6 +53,9 @@ export default function ProjectTable({ projects }: ProjectTableProps) {
             </th>
             <th className="px-6 py-4 text-white text-center font-lato font-extrabold text-sm leading-[32px]">
               Status
+            </th>
+            <th className="px-6 py-4 text-white text-center font-lato font-extrabold text-sm leading-[32px]">
+              Ações
             </th>
           </tr>
         </thead>
@@ -72,6 +79,19 @@ export default function ProjectTable({ projects }: ProjectTableProps) {
               </td>
               <td className="px-6 py-4 text-center font-lato text-sm font-medium">
                 {getProjectData(project).status}
+              </td>
+              <td className="px-6 py-4 text-center font-lato text-sm font-medium">
+                <button
+                  onClick={() => {
+                    if (window.confirm('Tem certeza que deseja excluir este projeto?')) {
+                      onDelete(project.id);
+                    }
+                  }}
+                  className="text-red-500 hover:text-red-700 transition-colors"
+                  title="Excluir projeto"
+                >
+                  <FontAwesomeIcon icon={faTrash} />
+                </button>
               </td>
             </tr>
           ))}
