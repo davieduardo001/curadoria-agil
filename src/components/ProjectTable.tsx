@@ -2,13 +2,31 @@
 
 interface ProjectTableProps {
   projects: Array<{
-    titulo: string;
-    dataInicio: string;
-    dataFim: string;
-    sprintAtual: string;
-    horarioDaily: string;
-    status: string;
+    id: string;
+    title?: string;
+    description?: string;
+    startDate?: string;
+    endDate?: string;
+    createdAt?: string;
+    updatedAt?: string;
+    titulo?: string;
+    dataInicio?: string;
+    dataFim?: string;
+    sprintAtual?: string;
+    horarioDaily?: string;
+    status?: string;
+    dailyTime?: string;
   }>;
+}
+
+function getProjectData(project: ProjectTableProps['projects'][0]) {
+  return {
+    title: project.title || project.titulo || 'Sem título',
+    startDate: project.startDate || project.dataInicio || 'Não definida',
+    endDate: project.endDate || project.dataFim || 'Não definida',
+    dailyTime: project.dailyTime || 'Não definido',
+    status: project.status || 'Em andamento'
+  };
 }
 
 export default function ProjectTable({ projects }: ProjectTableProps) {
@@ -18,19 +36,16 @@ export default function ProjectTable({ projects }: ProjectTableProps) {
         <thead>
           <tr className="bg-[#265864] rounded-lg">
             <th className="px-6 py-4 text-white text-center font-lato font-extrabold text-sm leading-[32px]">
-              Título do Projeto
+              Título
             </th>
             <th className="px-6 py-4 text-white text-center font-lato font-extrabold text-sm leading-[32px]">
-              Data Início
+              Data Inicial
             </th>
             <th className="px-6 py-4 text-white text-center font-lato font-extrabold text-sm leading-[32px]">
-              Data Fim
+              Data Final
             </th>
             <th className="px-6 py-4 text-white text-center font-lato font-extrabold text-sm leading-[32px]">
-              Sprint Atual
-            </th>
-            <th className="px-6 py-4 text-white text-center font-lato font-extrabold text-sm leading-[32px]">
-              Horário das Daily's
+              Horário Daily
             </th>
             <th className="px-6 py-4 text-white text-center font-lato font-extrabold text-sm leading-[32px]">
               Status
@@ -44,22 +59,19 @@ export default function ProjectTable({ projects }: ProjectTableProps) {
               className="border-b border-gray-200 hover:bg-gray-50 transition-colors duration-200"
             >
               <td className="px-6 py-4 text-center font-lato text-sm font-medium">
-                {project.titulo}
+                {getProjectData(project).title}
               </td>
               <td className="px-6 py-4 text-center font-lato text-sm font-medium">
-                {project.dataInicio}
+                {getProjectData(project).startDate}
               </td>
               <td className="px-6 py-4 text-center font-lato text-sm font-medium">
-                {project.dataFim}
+                {getProjectData(project).endDate}
               </td>
               <td className="px-6 py-4 text-center font-lato text-sm font-medium">
-                {project.sprintAtual}
+                {getProjectData(project).dailyTime}
               </td>
               <td className="px-6 py-4 text-center font-lato text-sm font-medium">
-                {project.horarioDaily}
-              </td>
-              <td className="px-6 py-4 text-center font-lato text-sm font-medium">
-                {project.status}
+                {getProjectData(project).status}
               </td>
             </tr>
           ))}

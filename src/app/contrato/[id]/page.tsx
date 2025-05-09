@@ -15,6 +15,8 @@ interface Project {
   description: string;
   startDate: string;
   endDate: string;
+  dailyTime: string;
+  status: string;
   createdAt: string;
   updatedAt: string;
 }
@@ -58,12 +60,14 @@ export default function ContractPage() {
           const data = doc.data();
           return {
             id: doc.id,
-            title: data.title,
-            description: data.description,
-            startDate: data.startDate,
-            endDate: data.endDate,
-            createdAt: data.createdAt,
-            updatedAt: data.updatedAt
+            title: data.title || data.titulo,
+            description: data.description || data.sprintAtual,
+            startDate: data.startDate || data.dataInicio,
+            endDate: data.endDate || data.dataFim,
+            dailyTime: data.dailyTime || data.horarioDaily || '10:00',
+            status: data.status || data.situacao || 'Em andamento',
+            createdAt: data.createdAt || new Date().toISOString(),
+            updatedAt: data.updatedAt || new Date().toISOString()
           };
         });
         setProjects(projectsData);
@@ -101,32 +105,21 @@ export default function ContractPage() {
                   Cadastrar Projeto
                 </SecondaryButton>
               </div>
-            </div>
 
-            {loadingProjects ? (
-              <div className="mt-8 text-center">Carregando projetos...</div>
-            ) : (
-              <div className="mt-8">
-                {projects.length === 0 ? (
-                  <div className="text-center text-gray-500 py-8">
-                    Nenhum projeto cadastrado ainda
-                  </div>
-                ) : (
-                  <div className="space-y-4">
-                    <ProjectTable
-                      projects={projects.map(project => ({
-                        titulo: project.title,
-                        dataInicio: project.startDate,
-                        dataFim: project.endDate,
-                        sprintAtual: 'Sprint 1',
-                        horarioDaily: '10:00',
-                        status: 'Em andamento'
-                      }))}
-                    />
-                  </div>
-                )}
-              </div>
-            )}
+              {loadingProjects ? (
+                <div className="mt-8 text-center">Carregando projetos...</div>
+              ) : (
+                <div className="mt-8">
+                  {projects.length === 0 ? (
+                    <div className="text-center text-gray-500 py-8">
+                      Nenhum projeto cadastrado ainda
+                    </div>
+                  ) : (
+                    <ProjectTable projects={projects} />
+                  )}
+                </div>
+              )}
+            </div>
           </div>
         </div>
       </main>
