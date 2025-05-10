@@ -2,6 +2,7 @@
 
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faTrash } from '@fortawesome/free-solid-svg-icons';
+import { useRouter } from 'next/navigation';
 
 interface ProjectTableProps {
   projects: Array<{
@@ -21,6 +22,7 @@ interface ProjectTableProps {
     dailyTime?: string;
   }>;
   onDelete: (id: string) => void;
+  contractId: string;
 }
 
 function getProjectData(project: ProjectTableProps['projects'][0]) {
@@ -33,7 +35,8 @@ function getProjectData(project: ProjectTableProps['projects'][0]) {
   };
 }
 
-export default function ProjectTable({ projects, onDelete }: ProjectTableProps) {
+export default function ProjectTable({ projects, onDelete, contractId }: ProjectTableProps) {
+  const router = useRouter();
   return (
     <div className="overflow-x-auto">
       <table className="min-w-full rounded-lg">
@@ -62,8 +65,9 @@ export default function ProjectTable({ projects, onDelete }: ProjectTableProps) 
         <tbody>
           {projects.map((project, index) => (
             <tr 
-              key={index} 
-              className="border-b border-gray-200 hover:bg-gray-50 transition-colors duration-200"
+              key={project.id} 
+              className="border-b border-gray-200 hover:bg-gray-50 cursor-pointer"
+              onClick={() => router.push(`/contrato/${contractId}/projeto/${project.id}`)}
             >
               <td className="px-6 py-4 text-center font-lato text-sm font-medium">
                 {getProjectData(project).title}
@@ -82,7 +86,8 @@ export default function ProjectTable({ projects, onDelete }: ProjectTableProps) 
               </td>
               <td className="px-6 py-4 text-center font-lato text-sm font-medium">
                 <button
-                  onClick={() => {
+                  onClick={(e) => {
+                    e.stopPropagation();
                     if (window.confirm('Tem certeza que deseja excluir este projeto?')) {
                       onDelete(project.id);
                     }

@@ -131,6 +131,7 @@ export default function ContractPage() {
                     <ProjectTable 
                       projects={projects} 
                       onDelete={handleDeleteProject}
+                      contractId={id as string}
                     />
                   )}
                 </div>
