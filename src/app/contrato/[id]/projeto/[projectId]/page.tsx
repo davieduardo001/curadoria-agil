@@ -14,24 +14,63 @@ export default function ProjectDetailsPage() {
   const [project, setProject] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const { user, loading: authLoading } = useAuth();
+  const [contratoNome, setContratoNome] = useState<string | null>(null);
 
   useEffect(() => {
-    const fetchProject = async () => {
+    const fetchProjectAndContrato = async () => {
       try {
         const projectRef = doc(db, 'projetos', projectId as string);
         const projectDoc = await getDoc(projectRef);
         if (projectDoc.exists()) {
-          setProject(projectDoc.data());
+          const projectData = projectDoc.data();
+          setProject(projectData);
+
+          // Handle parent as string path or Firestore DocumentReference
+          const parentField = projectData.parent;
+          console.log('LOG LOG LOG -> parentField', parentField);
+
+          if (typeof parentField === 'string' && parentField.startsWith('/contratos/')) {
+            // If parent is a path string
+            const contratoId = parentField.replace('/contratos/', '');
+            if (contratoId) {
+              const contratoRef = doc(db, 'contratos', contratoId);
+              const contratoDoc = await getDoc(contratoRef);
+              if (contratoDoc.exists()) {
+                setContratoNome(contratoDoc.data().title || contratoDoc.data().nome || contratoDoc.data().name || 'Cliente não encontrado');
+              } else {
+                setContratoNome('Cliente não encontrado');
+              }
+            } else {
+              setContratoNome('Cliente não encontrado');
+            }
+          } else if (parentField && typeof parentField === 'object' && parentField._key && parentField._key.path && Array.isArray(parentField._key.path.segments)) {
+            // If parent is a Firestore DocumentReference (raw object)
+            const segments = parentField._key.path.segments;
+            const contratoId = segments[segments.length - 1];
+            if (contratoId) {
+              const contratoRef = doc(db, 'contratos', contratoId);
+              const contratoDoc = await getDoc(contratoRef);
+              if (contratoDoc.exists()) {
+                setContratoNome(contratoDoc.data().title || contratoDoc.data().nome || contratoDoc.data().name || 'Cliente não encontrado');
+              } else {
+                setContratoNome('Cliente não encontrado');
+              }
+            } else {
+              setContratoNome('Cliente não encontrado');
+            }
+          } else {
+            setContratoNome('Cliente não encontrado');
+          }
         }
       } catch (error) {
-        console.error('Error fetching project:', error);
+        console.error('Error fetching project or contrato:', error);
+        setContratoNome('Erro ao buscar cliente');
       } finally {
         setLoading(false);
       }
     };
-
     if (projectId) {
-      fetchProject();
+      fetchProjectAndContrato();
     }
   }, [projectId]);
 
@@ -96,6 +135,9 @@ export default function ProjectDetailsPage() {
               Cadastro de Sprint
           </button>
         </div>
+
+
+
         <div className="bg-white rounded-lg shadow p-6">
           <div className="mb-6">
             <div className="flex items-center justify-between mb-4">
@@ -136,7 +178,7 @@ export default function ProjectDetailsPage() {
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">Cliente</label>
               <p className="w-full bg-gray-50 rounded-md border border-gray-200 px-3 py-2">
-                {project.cliente || 'Xxxxxxxxxxxx'}
+                {contratoNome || 'Xxxxxxxxxxxx'}
               </p>
             </div>
             <div>
