@@ -12,15 +12,22 @@ interface StepperProps {
 
 export default function Stepper({ steps, currentStep }: StepperProps) {
   return (
-    <ol className="flex items-center w-full text-sm text-gray-500 font-medium sm:text-base">
+    <div className="flex justify-center w-full mx-auto max-w-xl">
+      <ol className="flex items-center w-full text-sm text-gray-500 font-medium sm:text-base">
+
       {steps.map((step, index) => (
         <li
           key={index}
-          className={`flex md:w-full items-center ${
+          className={`flex md:w-full items-center${
+            index !== steps.length - 1
+              ? " sm:after:content-[''] after:w-full after:h-1 after:border-b after:border-gray-200 after:border-1 after:hidden sm:after:inline-block after:mx-4 xl:after:mx-8"
+              : ''
+          } ${
             currentStep >= index + 1
               ? 'text-[var(--primary)]'
               : 'text-gray-600'
-          } sm:after:content-[''] after:w-full after:h-1 after:border-b after:border-gray-200 after:border-1 after:hidden sm:after:inline-block after:mx-4 xl:after:mx-8`}
+          }`}
+
         >
           <div className="flex items-center whitespace-nowrap after:content-['/'] sm:after:hidden after:mx-2">
             <span
@@ -42,5 +49,7 @@ export default function Stepper({ steps, currentStep }: StepperProps) {
         </li>
       ))}
     </ol>
+    </div>
   );
 }
+

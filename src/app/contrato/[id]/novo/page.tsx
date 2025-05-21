@@ -4,7 +4,7 @@ import { useEffect, useState } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import { useAuth } from '@/contexts/AuthContext';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faPenToSquare } from '@fortawesome/free-solid-svg-icons';
+import { faPenToSquare, faFlagCheckered } from '@fortawesome/free-solid-svg-icons';
 import Navbar from '@/components/Navbar';
 import ProjectForm from '@/components/ProjectForm';
 import Stepper from '@/components/Stepper';
@@ -49,7 +49,7 @@ export default function NewProjectPage() {
     },
     {
       title: 'Sprint',
-      icon: <FontAwesomeIcon icon={faPenToSquare} className="w-4 h-4" />
+      icon: <FontAwesomeIcon icon={faFlagCheckered} className="w-4 h-4" />
     }
   ];
 
