@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { collection, addDoc, doc } from 'firebase/firestore';
+import { collection, addDoc, doc, getDoc } from 'firebase/firestore';
 import { db } from '@/lib/firebase';
 import { useParams } from 'next/navigation';
 import { useAuth } from '@/contexts/AuthContext';
@@ -40,6 +40,14 @@ export default function SprintForm({ projectId, onBack, onSprintSaved }: SprintF
     setError('');
 
     try {
+      // Verify project exists
+      const projectRef = doc(db, 'projetos', projectId);
+      const projectDoc = await getDoc(projectRef);
+      
+      if (!projectDoc.exists()) {
+        throw new Error('O projeto não existe. Não é possível criar uma sprint.');
+      }
+
       await addDoc(collection(db, 'sprints'), {
         meta,
         sprintAtual,

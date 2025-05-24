@@ -2,9 +2,19 @@
 
 import { useParams } from 'next/navigation';
 import { useAuth } from '@/contexts/AuthContext';
-import { collection, doc, getDoc, updateDoc } from 'firebase/firestore';
+import { collection, doc, getDoc, updateDoc, query, where, getDocs } from 'firebase/firestore';
 import { db } from '@/lib/firebase';
 import { useEffect, useState } from 'react';
+
+const formatDate = (dateString: string) => {
+  if (!dateString) return '';
+  const date = new Date(dateString);
+  return date.toLocaleDateString('pt-BR', {
+    day: '2-digit',
+    month: '2-digit',
+    year: 'numeric'
+  });
+};
 import Navbar from '@/components/Navbar';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faArrowLeft, faCalendar, faPenToSquare, faPencilAlt } from '@fortawesome/free-solid-svg-icons';
@@ -22,11 +32,45 @@ export default function ProjectDetailsPage() {
   const [editStatus, setEditStatus] = useState('');
   const [editStartDate, setEditStartDate] = useState('');
   const [editEndDate, setEditEndDate] = useState('');
+
+  // Format date string from yyyy-mm-dd to mm/dd/yyyy for display
+  const formatDateForDisplay = (dateString: string) => {
+    if (!dateString) return '';
+    const [year, month, day] = dateString.split('-');
+    return `${month}/${day}/${year}`;
+  };
+
+  // Format date string from mm/dd/yyyy to yyyy-mm-dd for input
+  const formatDateForInput = (dateString: string) => {
+    if (!dateString) return '';
+    const [month, day, year] = dateString.split('/');
+    return `${year}-${month}-${day}`;
+  };
   const [editDailyTime, setEditDailyTime] = useState('');
+  const [currentSprint, setCurrentSprint] = useState<any>(null);
 
   useEffect(() => {
     const fetchProjectAndContrato = async () => {
+      const fetchCurrentSprint = async (projectId: string) => {
+        console.log('Fetching sprint for projectId:', projectId);
+        const sprintsRef = collection(db, 'sprints');
+        const q = query(sprintsRef, 
+          where('projectId', '==', projectId),
+          where('sprintAtual', '==', true)
+        );
+        const sprintsSnapshot = await getDocs(q);
+        console.log('Sprint query results:', sprintsSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() })));
+        if (!sprintsSnapshot.empty) {
+          const sprintData = sprintsSnapshot.docs[0].data();
+          console.log('Found current sprint:', sprintData);
+          setCurrentSprint(sprintData);
+        } else {
+          console.log('No current sprint found');
+        }
+      };
+
       try {
+        console.log('Current projectId from params:', projectId);
         const projectRef = doc(db, 'projetos', projectId as string);
         const projectDoc = await getDoc(projectRef);
         if (projectDoc.exists()) {
@@ -36,9 +80,12 @@ export default function ProjectDetailsPage() {
           // Set edit fields when entering edit mode
           setEditTitle(projectData.title || '');
           setEditStatus(projectData.status || '');
-          setEditStartDate(projectData.startDate || '');
-          setEditEndDate(projectData.endDate || '');
+          setEditStartDate(formatDateForInput(projectData.startDate) || '');
+          setEditEndDate(formatDateForInput(projectData.endDate) || '');
           setEditDailyTime(projectData.dailyTime || '');
+
+          // Fetch current sprint
+          await fetchCurrentSprint(projectId as string);
 
           // Handle parent as string path or Firestore DocumentReference
           const parentField = projectData.parent;
@@ -259,7 +306,7 @@ export default function ProjectDetailsPage() {
                     <label className="block text-sm font-medium text-gray-700 mb-1">Sprint Atual</label>
                     <input
                       type="text"
-                      value={project?.sprintAtual || ''}
+                      value={currentSprint ? `Sprint ${currentSprint.numero}` : 'Nenhuma sprint ativa'}
                       disabled
                       className="w-full rounded-md border border-gray-200 px-3 py-2 bg-gray-50 cursor-not-allowed"
                       placeholder="Sprint atual"
@@ -294,7 +341,7 @@ export default function ProjectDetailsPage() {
                     <label className="block text-sm font-medium text-gray-700 mb-1">Data Inicial</label>
                     <div className="relative">
                       <p className="w-full bg-gray-50 rounded-md px-3 py-2">
-                        {project.startDate || project.dataInicio || 'xx/xx/xxxx'}
+                        {formatDateForDisplay(project.startDate) || 'mm/dd/yyyy'}
                       </p>
                       <FontAwesomeIcon icon={faCalendar} className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
                     </div>
@@ -303,7 +350,7 @@ export default function ProjectDetailsPage() {
                     <label className="block text-sm font-medium text-gray-700 mb-1">Data Final</label>
                     <div className="relative">
                       <p className="w-full bg-gray-50 rounded-md px-3 py-2">
-                        {project.endDate || project.dataFim || 'xx/xx/xxxx'}
+                        {formatDateForDisplay(project.endDate) || 'mm/dd/yyyy'}
                       </p>
                       <FontAwesomeIcon icon={faCalendar} className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
                     </div>
@@ -336,9 +383,11 @@ export default function ProjectDetailsPage() {
                   </div>
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-1">Sprint Atual</label>
-                    <p className="w-full bg-gray-50 rounded-md px-3 py-2">
-                      {project.sprintAtual || 'Xxxxxxxxxxxx'}
-                    </p>
+                    <div className="relative">
+                      <p className="w-full bg-gray-50 rounded-md px-3 py-2">
+                        {currentSprint ? `Sprint ${currentSprint.numero}` : 'Nenhuma sprint ativa'}
+                      </p>
+                    </div>
                   </div>
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-1">Horário Daily</label>
