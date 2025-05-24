@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { collection, addDoc, doc, getDoc } from 'firebase/firestore';
+import { collection, addDoc, doc, getDoc, query, where, getDocs, orderBy } from 'firebase/firestore';
 import { db } from '@/lib/firebase';
 import { useParams } from 'next/navigation';
 import { useAuth } from '@/contexts/AuthContext';
@@ -48,6 +48,14 @@ export default function SprintForm({ projectId, onBack, onSprintSaved }: SprintF
         throw new Error('O projeto não existe. Não é possível criar uma sprint.');
       }
 
+      // Get all sprints for this project and find the highest number
+      const sprintsRef = collection(db, 'sprints');
+      const q = query(sprintsRef, where('projectId', '==', projectId));
+      const sprintsSnapshot = await getDocs(q);
+      const lastSprintNumber = sprintsSnapshot.empty ? -1 :
+        Math.max(...sprintsSnapshot.docs.map(doc => doc.data().numero));
+
+      // Create new sprint with next number in sequence
       await addDoc(collection(db, 'sprints'), {
         meta,
         sprintAtual,
@@ -55,19 +63,20 @@ export default function SprintForm({ projectId, onBack, onSprintSaved }: SprintF
         dataFinal,
         observacoes,
         projectId,
-        numero: 0,
+        numero: lastSprintNumber + 1,
         createdAt: new Date().toISOString(),
         createdBy: user?.email || 'anonymous',
       });
 
-      router.push(`/contrato/${projectId}`);
+      if (onSprintSaved) {
+        onSprintSaved();
+      }
+      onBack();
     } catch (err) {
       setError('Erro ao salvar sprint');
       console.error('Erro ao salvar sprint:', err);
     } finally {
       setLoading(false);
-      onBack();
-      onSprintSaved?.();
     }
   };
 

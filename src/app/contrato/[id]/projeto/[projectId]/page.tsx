@@ -1,6 +1,6 @@
 'use client';
 
-import { useParams } from 'next/navigation';
+import { useParams, useRouter } from 'next/navigation';
 import { useAuth } from '@/contexts/AuthContext';
 import { collection, doc, getDoc, updateDoc, query, where, getDocs } from 'firebase/firestore';
 import { db } from '@/lib/firebase';
@@ -17,11 +17,17 @@ const formatDate = (dateString: string) => {
 };
 import Navbar from '@/components/Navbar';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faArrowLeft, faCalendar, faPenToSquare, faPencilAlt } from '@fortawesome/free-solid-svg-icons';
+import { faArrowLeft, faCalendar, faPenToSquare, faPencilAlt, faPlus } from '@fortawesome/free-solid-svg-icons';
+import SprintCard from '@/components/SprintCard';
+import { Sprint } from '@/types/sprint';
+import SprintFormModal from '@/components/SprintFormModal';
 import SecondaryButton from '@/components/SecondaryButton';
 
 export default function ProjectDetailsPage() {
-  const { id: contractId, projectId } = useParams();
+  const params = useParams();
+  const router = useRouter();
+  const id = params.id as string;
+  const projectId = params.projectId as string;
   const [project, setProject] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const { user, loading: authLoading } = useAuth();
@@ -47,31 +53,48 @@ export default function ProjectDetailsPage() {
     return `${year}-${month}-${day}`;
   };
   const [editDailyTime, setEditDailyTime] = useState('');
-  const [currentSprint, setCurrentSprint] = useState<any>(null);
+  const [currentSprint, setCurrentSprint] = useState<Sprint | null>(null);
+  const [sprints, setSprints] = useState<Sprint[]>([]);
+  const [isSprintModalOpen, setIsSprintModalOpen] = useState(false);
+
+  // Fetch all sprints for this project
+  const fetchProjectSprints = async (projectId: string) => {
+    const sprintsRef = collection(db, 'sprints');
+    const q = query(sprintsRef, where('projectId', '==', projectId));
+    const sprintsSnapshot = await getDocs(q);
+    const sprintsData = sprintsSnapshot.docs.map(doc => ({
+      id: doc.id,
+      ...doc.data()
+    })) as Sprint[];
+    // Sort sprints by numero in descending order (newest first)
+    sprintsData.sort((a, b) => b.numero - a.numero);
+    setSprints(sprintsData);
+  };
+
+  const fetchCurrentSprint = async (projectId: string) => {
+    console.log('Fetching sprint for projectId:', projectId);
+    const sprintsRef = collection(db, 'sprints');
+    const q = query(sprintsRef, 
+      where('projectId', '==', projectId),
+      where('sprintAtual', '==', true)
+    );
+    const sprintsSnapshot = await getDocs(q);
+    console.log('Sprint query results:', sprintsSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() })));
+    if (!sprintsSnapshot.empty) {
+      const sprintData = sprintsSnapshot.docs[0].data();
+      console.log('Found current sprint:', sprintData);
+      setCurrentSprint(sprintData);
+    } else {
+      console.log('No current sprint found');
+    }
+  };
 
   useEffect(() => {
     const fetchProjectAndContrato = async () => {
-      const fetchCurrentSprint = async (projectId: string) => {
-        console.log('Fetching sprint for projectId:', projectId);
-        const sprintsRef = collection(db, 'sprints');
-        const q = query(sprintsRef, 
-          where('projectId', '==', projectId),
-          where('sprintAtual', '==', true)
-        );
-        const sprintsSnapshot = await getDocs(q);
-        console.log('Sprint query results:', sprintsSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() })));
-        if (!sprintsSnapshot.empty) {
-          const sprintData = sprintsSnapshot.docs[0].data();
-          console.log('Found current sprint:', sprintData);
-          setCurrentSprint(sprintData);
-        } else {
-          console.log('No current sprint found');
-        }
-      };
 
       try {
         console.log('Current projectId from params:', projectId);
-        const projectRef = doc(db, 'projetos', projectId as string);
+        const projectRef = doc(db, 'projetos', projectId);
         const projectDoc = await getDoc(projectRef);
         if (projectDoc.exists()) {
           const projectData = projectDoc.data();
@@ -84,8 +107,9 @@ export default function ProjectDetailsPage() {
           setEditEndDate(formatDateForInput(projectData.endDate) || '');
           setEditDailyTime(projectData.dailyTime || '');
 
-          // Fetch current sprint
-          await fetchCurrentSprint(projectId as string);
+          // Fetch sprints
+          await fetchCurrentSprint(projectId);
+          await fetchProjectSprints(projectId);
 
           // Handle parent as string path or Firestore DocumentReference
           const parentField = projectData.parent;
@@ -193,8 +217,12 @@ export default function ProjectDetailsPage() {
           </div>
         </div>
         <div className="flex justify-end w-full mb-8">
-          <SecondaryButton className="whitespace-nowrap">
-              Cadastro de Sprint
+          <SecondaryButton 
+            onClick={() => setIsSprintModalOpen(true)}
+            className="whitespace-nowrap flex items-center gap-2"
+          >
+            <FontAwesomeIcon icon={faPlus} className="w-4 h-4" />
+            Cadastro de Sprint
           </SecondaryButton>
         </div>
 
@@ -401,7 +429,35 @@ export default function ProjectDetailsPage() {
           </div>
 
         </div>
+
+        {/* Sprint List Section */}
+        <div className="mt-8 bg-white rounded-lg shadow p-6">
+          <div className="mb-6">
+            <h2 className="text-lg font-semibold text-gray-700">Sprints</h2>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {sprints.map((sprint) => (
+              <SprintCard
+                key={sprint.id}
+                sprintNumber={sprint.numero}
+                meta={sprint.meta}
+                onClick={() => router.push(`/contrato/${id}/projeto/${projectId}/sprint/${sprint.id}`)}
+              />
+            ))}
+          </div>
+        </div>
       </main>
+      {/* Sprint Form Modal */}
+      <SprintFormModal
+        isOpen={isSprintModalOpen}
+        onClose={() => setIsSprintModalOpen(false)}
+        projectId={projectId}
+        onSprintSaved={() => {
+          fetchProjectSprints(projectId);
+          fetchCurrentSprint(projectId);
+        }}
+      />
     </div>
   );
 }
