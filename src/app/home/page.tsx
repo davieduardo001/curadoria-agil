@@ -4,7 +4,7 @@ import { useAuth } from '@/contexts/AuthContext';
 import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import Navbar from '@/components/Navbar';
-import ContractForm from '@/components/ContractForm';
+import ContractFormModal from '@/components/ContractFormModal';
 import { collection, query, getDocs } from 'firebase/firestore';
 import Link from 'next/link';
 import { db } from '@/lib/firebase';
@@ -74,13 +74,12 @@ export default function Home() {
   return (
     <div className="min-h-screen bg-gray-100">
       <Navbar />
-      {showForm && (
-        <ContractForm
-          onClose={handleCloseForm}
-          refetchProjects={handleRefetchProjects}
-          project={selectedProject}
-        />
-      )}
+      <ContractFormModal
+        isOpen={showForm}
+        onClose={handleCloseForm}
+        refetchProjects={handleRefetchProjects}
+        project={selectedProject}
+      />
       
       {/* Main Content */}
       <main className="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">
