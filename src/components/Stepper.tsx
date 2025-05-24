@@ -2,7 +2,7 @@
 
 interface Step {
   title: string;
-  description?: string;
+  subtitle?: string;
 }
 
 interface StepperProps {
@@ -12,40 +12,34 @@ interface StepperProps {
 
 export default function Stepper({ steps, currentStep }: StepperProps) {
   return (
-    <div className="flex justify-center w-full mx-auto max-w-xl">
-      <ol className="flex items-center w-full text-sm text-gray-500 font-medium sm:text-base">
+    <div className="w-full">
+      <ol className="flex items-center w-full p-3 space-x-2 text-sm font-medium text-center text-gray-500 bg-white border border-gray-200 rounded-lg shadow-xs sm:text-base sm:p-4 sm:space-x-4 rtl:space-x-reverse">
 
       {steps.map((step, index) => (
         <li
           key={index}
-          className={`flex md:w-full items-center${
-            index !== steps.length - 1
-              ? " sm:after:content-[''] after:w-full after:h-1 after:border-b after:border-gray-200 after:border-1 after:hidden sm:after:inline-block after:mx-4 xl:after:mx-8"
-              : ''
-          } ${
+          className={`flex items-center ${
             currentStep >= index + 1
               ? 'text-[var(--primary)]'
               : 'text-gray-600'
           }`}
 
         >
-          <div className="flex items-center whitespace-nowrap after:content-['/'] sm:after:hidden after:mx-2">
-            <span
-              className={`w-6 h-6 ${
-                currentStep >= index + 1
-                  ? 'bg-[var(--primary)] border-[var(--primary)] text-white'
-                  : 'bg-gray-100 border-gray-200 text-gray-500'
-              } border rounded-full flex justify-center items-center mr-3 lg:w-10 lg:h-10`}
-            >
-              {index + 1}
-            </span>
-            <span className="whitespace-nowrap">
-              {step.title}
-              {step.description && (
-                <span className="block text-xs mt-1 text-gray-400">{step.description}</span>
-              )}
-            </span>
-          </div>
+          <span
+            className={`flex items-center justify-center w-5 h-5 me-2 text-xs border rounded-full shrink-0 ${
+              currentStep >= index + 1
+                ? 'text-blue-600 border-blue-600'
+                : 'border-gray-500'
+            }`}
+          >
+            {index + 1}
+          </span>
+          {step.title} <span className="hidden sm:inline-flex sm:ms-2">{step.subtitle}</span>
+          {index !== steps.length - 1 && (
+            <svg className="w-3 h-3 ms-2 sm:ms-4 rtl:rotate-180" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 12 10">
+              <path stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="m7 9 4-4-4-4M1 9l4-4-4-4"/>
+            </svg>
+          )}
         </li>
       ))}
     </ol>

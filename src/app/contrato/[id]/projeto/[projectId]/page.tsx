@@ -146,9 +146,9 @@ export default function ProjectDetailsPage() {
           </div>
         </div>
         <div className="flex justify-end w-full mb-8">
-          <button className="bg-[#124E5B] hover:bg-[#18AAB0] text-white px-4 py-2 rounded-md shadow font-semibold transition-colors duration-200 whitespace-nowrap">
+          <SecondaryButton className="whitespace-nowrap">
               Cadastro de Sprint
-          </button>
+          </SecondaryButton>
         </div>
 
         <div className="bg-white rounded-lg shadow p-6">

@@ -45,11 +45,11 @@ export default function NewProjectPage() {
   const steps = [
     {
       title: 'Projeto',
-      icon: <FontAwesomeIcon icon={faPenToSquare} className="w-4 h-4" />
+      subtitle: 'Info'
     },
     {
       title: 'Sprint',
-      icon: <FontAwesomeIcon icon={faFlagCheckered} className="w-4 h-4" />
+      subtitle: 'Info'
     }
   ];
 
