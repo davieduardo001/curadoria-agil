@@ -44,12 +44,10 @@ export default function NewProjectPage() {
 
   const steps = [
     {
-      title: 'Projeto',
-      subtitle: 'Info'
+      title: 'Projeto'
     },
     {
-      title: 'Sprint',
-      subtitle: 'Info'
+      title: 'Sprint'
     }
   ];
 
