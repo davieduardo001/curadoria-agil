@@ -14,8 +14,6 @@ export default function SecondaryButton({ children, className = '', ...props }: 
         px-4 py-2 
         text-white 
         rounded-lg 
-        border 
-        border-[#124E5B] 
         bg-[#124E5B] 
         hover:bg-[#18AAB0] 
         hover:rounded-none 

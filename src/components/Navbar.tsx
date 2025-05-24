@@ -26,7 +26,7 @@ export default function Navbar() {
           <div className="flex justify-between h-full items-center px-6">
             <div className="flex items-center">
               <div className="flex-shrink-0 flex items-center">
-                <span className="text-xl font-bold text-white">HOME</span>
+                <Link href="/home" className="text-xl font-bold text-white hover:text-gray-200 transition-colors">SCA</Link>
               </div>
             </div>
             
