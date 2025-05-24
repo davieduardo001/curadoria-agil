@@ -15,9 +15,9 @@ export default function SecondaryButton({ children, className = '', ...props }: 
         text-white 
         rounded-lg 
         border 
-        border-[#3ECBD0] 
-        bg-[#18AAB0] 
-        hover:bg-[#18AAB0]/90 
+        border-[#124E5B] 
+        bg-[#124E5B] 
+        hover:bg-[#18AAB0] 
         hover:rounded-none 
         transition-all 
         duration-300 
