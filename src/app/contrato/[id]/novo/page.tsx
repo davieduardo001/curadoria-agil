@@ -47,7 +47,7 @@ export default function NewProjectPage() {
       title: 'Projeto'
     },
     {
-      title: 'Sprint'
+      title: 'Sprint 0'
     }
   ];
 
@@ -71,7 +71,7 @@ export default function NewProjectPage() {
 
           <div className="mt-8">
             <FormContainer
-              title={currentStep === 1 ? "Dados do Projeto" : "Dados da Sprint"}
+              title={currentStep === 1 ? "Dados do Projeto" : "Dados da Sprint 0"}
             >
               <div className="border-b border-gray-300 mb-6"></div>
               {currentStep === 1 ? (

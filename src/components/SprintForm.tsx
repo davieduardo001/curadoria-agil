@@ -47,6 +47,7 @@ export default function SprintForm({ projectId, onBack, onSprintSaved }: SprintF
         dataFinal,
         observacoes,
         projectId,
+        numero: 0,
         createdAt: new Date().toISOString(),
         createdBy: user?.email || 'anonymous',
       });
