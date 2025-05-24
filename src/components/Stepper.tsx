@@ -12,8 +12,8 @@ interface StepperProps {
 
 export default function Stepper({ steps, currentStep }: StepperProps) {
   return (
-    <div className="w-full">
-      <ol className="flex items-center w-full p-3 space-x-2 text-sm font-medium text-center text-gray-500 bg-white border border-gray-200 rounded-lg shadow-xs sm:text-base sm:p-4 sm:space-x-4 rtl:space-x-reverse">
+    <div className="w-full flex justify-center">
+      <ol className="inline-flex items-center p-3 space-x-2 text-sm font-medium text-center text-gray-500 bg-white border border-gray-200 rounded-lg shadow-xs sm:text-base sm:p-4 sm:space-x-4 rtl:space-x-reverse">
 
       {steps.map((step, index) => (
         <li
