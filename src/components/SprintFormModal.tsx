@@ -8,10 +8,12 @@ interface SprintFormModalProps {
   isOpen: boolean;
   onClose: () => void;
   projectId: string;
+  sprintId?: string;
+  initialData?: any;
   onSprintSaved: () => void;
 }
 
-export default function SprintFormModal({ isOpen, onClose, projectId, onSprintSaved }: SprintFormModalProps) {
+export default function SprintFormModal({ isOpen, onClose, projectId, sprintId, initialData, onSprintSaved }: SprintFormModalProps) {
   return (
     <Transition appear show={isOpen} as={Fragment}>
       <Dialog as="div" className="relative z-50" onClose={onClose}>
@@ -48,11 +50,13 @@ export default function SprintFormModal({ isOpen, onClose, projectId, onSprintSa
                 
                 <SprintForm 
                   projectId={projectId}
-                  onSprintSaved={() => {
+                  sprintId={sprintId}
+                  initialData={initialData}
+                  onSave={() => {
                     onSprintSaved();
                     onClose();
                   }}
-                  onBack={onClose}
+                  onClose={onClose}
                 />
               </Dialog.Panel>
             </Transition.Child>

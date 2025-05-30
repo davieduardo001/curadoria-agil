@@ -2,12 +2,55 @@
 
 import { PencilSquareIcon, LockClosedIcon, ChevronRightIcon } from '@heroicons/react/24/outline';
 import Navbar from '@/components/Navbar';
+import { useEffect, useState } from 'react';
+import { useParams } from 'next/navigation';
+import { doc, getDoc } from 'firebase/firestore';
+import { db } from '@/lib/firebase';
+import SprintFormModal from '@/components/SprintFormModal';
 
 
 export default function SprintPlanningPage() {
+  const { sprintId, projectId } = useParams();
+  const [sprintData, setSprintData] = useState<any>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState('');
+  const [showEditModal, setShowEditModal] = useState(false);
+
+  const fetchSprint = async () => {
+    try {
+      const sprintRef = doc(db, 'sprints', sprintId as string);
+      const sprintSnap = await getDoc(sprintRef);
+      if (sprintSnap.exists()) {
+        setSprintData(sprintSnap.data());
+      } else {
+        setError('Sprint não encontrada.');
+      }
+    } catch (err) {
+      setError('Erro ao buscar dados da sprint.');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    if (sprintId) fetchSprint();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [sprintId]);
+
   return (
     <>
       <Navbar />
+      <SprintFormModal
+        isOpen={showEditModal}
+        onClose={() => setShowEditModal(false)}
+        projectId={projectId as string}
+        sprintId={sprintId as string}
+        initialData={sprintData}
+        onSprintSaved={() => {
+          setShowEditModal(false);
+          fetchSprint();
+        }}
+      />
       <div className="min-h-screen bg-gray-50 py-8 px-4 md:px-8">
       <main className="max-w-5xl mx-auto">
         {/* Header */}
@@ -46,38 +89,49 @@ export default function SprintPlanningPage() {
         <div className="bg-white rounded-xl shadow p-6 mb-8">
           <div className="flex items-center justify-between mb-6">
             <h2 className="text-lg font-semibold text-gray-800">Dados da Sprint</h2>
-            <button className="p-2 rounded hover:bg-gray-100">
+            <button
+              className="p-2 rounded hover:bg-gray-100"
+              onClick={() => setShowEditModal(true)}
+              aria-label="Editar dados da sprint"
+              type="button"
+            >
               <PencilSquareIcon className="w-5 h-5 text-emerald-600" />
             </button>
           </div>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-4">
-            <div>
-              <span className="block text-gray-500 text-xs mb-1">Meta da Sprint</span>
-              <div className="font-medium text-gray-800 bg-gray-50 rounded px-3 py-2">Xxxxxxxxxxxx</div>
-            </div>
-            <div>
-              <span className="block text-gray-500 text-xs mb-1">Número do Sprint</span>
-              <div className="font-medium text-gray-800 bg-gray-50 rounded px-3 py-2">Xxxxxxxxxxxx</div>
-            </div>
-            <div>
-              <span className="block text-gray-500 text-xs mb-1">Data Inicial</span>
-              <div className="flex items-center font-medium text-gray-800 bg-gray-50 rounded px-3 py-2">
-                xx/xx/xxxx
-                <LockClosedIcon className="w-4 h-4 text-gray-400 ml-2" />
+          {loading ? (
+            <div className="text-gray-500">Carregando...</div>
+          ) : error ? (
+            <div className="text-red-500">{error}</div>
+          ) : sprintData ? (
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-4">
+              <div>
+                <span className="block text-gray-500 text-xs mb-1">Meta da Sprint</span>
+                <div className="font-medium text-gray-800 bg-gray-50 rounded px-3 py-2">{sprintData.meta || '-'}</div>
+              </div>
+              <div>
+                <span className="block text-gray-500 text-xs mb-1">Número do Sprint</span>
+                <div className="font-medium text-gray-800 bg-gray-50 rounded px-3 py-2">{sprintData.numero ?? '-'}</div>
+              </div>
+              <div>
+                <span className="block text-gray-500 text-xs mb-1">Data Inicial</span>
+                <div className="flex items-center font-medium text-gray-800 bg-gray-50 rounded px-3 py-2">
+                  {sprintData.dataInicial || '-'}
+                  <LockClosedIcon className="w-4 h-4 text-gray-400 ml-2" />
+                </div>
+              </div>
+              <div>
+                <span className="block text-gray-500 text-xs mb-1">Data Final</span>
+                <div className="flex items-center font-medium text-gray-800 bg-gray-50 rounded px-3 py-2">
+                  {sprintData.dataFinal || '-'}
+                  <LockClosedIcon className="w-4 h-4 text-gray-400 ml-2" />
+                </div>
+              </div>
+              <div className="md:col-span-2">
+                <span className="block text-gray-500 text-xs mb-1">Observações</span>
+                <div className="font-medium text-gray-800 bg-gray-50 rounded px-3 py-2 min-h-[56px]">{sprintData.observacoes || '-'}</div>
               </div>
             </div>
-            <div>
-              <span className="block text-gray-500 text-xs mb-1">Data Final</span>
-              <div className="flex items-center font-medium text-gray-800 bg-gray-50 rounded px-3 py-2">
-                xx/xx/xxxx
-                <LockClosedIcon className="w-4 h-4 text-gray-400 ml-2" />
-              </div>
-            </div>
-            <div className="md:col-span-2">
-              <span className="block text-gray-500 text-xs mb-1">Observações</span>
-              <div className="font-medium text-gray-800 bg-gray-50 rounded px-3 py-2 min-h-[56px]"></div>
-            </div>
-          </div>
+          ) : null}
         </div>
 
 
