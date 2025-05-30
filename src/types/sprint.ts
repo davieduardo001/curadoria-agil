@@ -9,4 +9,14 @@ export interface Sprint {
   projectId: string;
   createdAt: string;
   createdBy: string;
+  // Planning fields
+  dataRealizacao?: string;
+  dataEnvioPO?: string;
+  usMovimentadasAnterior?: number;
+  quantidadeBugs?: number;
+  quantidadeUs?: number;
+  totalStoryPoints?: number;
+  totalCapacity?: number;
+  pontosFuncao?: number;
+  usProximaSprint?: boolean;
 }

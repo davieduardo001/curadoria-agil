@@ -16,7 +16,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body className={lato.variable}>
+      <body className={lato.variable} suppressHydrationWarning>
         <AuthProvider>
           {children}
         </AuthProvider>

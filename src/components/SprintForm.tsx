@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { collection, addDoc, doc, getDoc, query, where, getDocs, orderBy } from 'firebase/firestore';
+import { collection, addDoc, doc, getDoc, query, where, getDocs, orderBy, updateDoc } from 'firebase/firestore';
 import { db } from '@/lib/firebase';
 import { useParams } from 'next/navigation';
 import { useAuth } from '@/contexts/AuthContext';
@@ -12,17 +12,26 @@ import SecondaryButton from './SecondaryButton';
 import PrimaryButton from './PrimaryButton';
 
 interface SprintFormProps {
-  projectId: string;
-  onBack: () => void;
-  onSprintSaved?: () => void;
+  projectId?: string;
+  onClose: () => void;
+  onSave?: () => void;
+  sprintId?: string;
+  initialData?: {
+    meta: string;
+    sprintAtual: boolean;
+    dataInicial: string;
+    dataFinal: string;
+    observacoes?: string;
+    numero: number;
+  };
 }
 
-export default function SprintForm({ projectId, onBack, onSprintSaved }: SprintFormProps) {
-  const [meta, setMeta] = useState('');
-  const [sprintAtual, setSprintAtual] = useState(false);
-  const [dataInicial, setDataInicial] = useState('');
-  const [dataFinal, setDataFinal] = useState('');
-  const [observacoes, setObservacoes] = useState('');
+export default function SprintForm({ projectId, onClose, onSave, sprintId, initialData }: SprintFormProps) {
+  const [meta, setMeta] = useState(initialData?.meta || '');
+  const [sprintAtual, setSprintAtual] = useState(initialData?.sprintAtual || false);
+  const [dataInicial, setDataInicial] = useState(initialData?.dataInicial || '');
+  const [dataFinal, setDataFinal] = useState(initialData?.dataFinal || '');
+  const [observacoes, setObservacoes] = useState(initialData?.observacoes || '');
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
 
@@ -40,38 +49,52 @@ export default function SprintForm({ projectId, onBack, onSprintSaved }: SprintF
     setError('');
 
     try {
-      // Verify project exists
-      const projectRef = doc(db, 'projetos', projectId);
-      const projectDoc = await getDoc(projectRef);
-      
-      if (!projectDoc.exists()) {
-        throw new Error('O projeto não existe. Não é possível criar uma sprint.');
+      if (sprintId) {
+        // Update existing sprint
+        const sprintRef = doc(db, 'sprints', sprintId);
+        await updateDoc(sprintRef, {
+          meta,
+          sprintAtual,
+          dataInicial,
+          dataFinal,
+          observacoes,
+          updatedAt: new Date().toISOString(),
+          updatedBy: user?.email || 'anonymous',
+        });
+      } else if (projectId) {
+        // Verify project exists
+        const projectRef = doc(db, 'projetos', projectId);
+        const projectDoc = await getDoc(projectRef);
+        
+        if (!projectDoc.exists()) {
+          throw new Error('O projeto não existe. Não é possível criar uma sprint.');
+        }
+
+        // Get all sprints for this project and find the highest number
+        const sprintsRef = collection(db, 'sprints');
+        const q = query(sprintsRef, where('projectId', '==', projectId));
+        const sprintsSnapshot = await getDocs(q);
+        const lastSprintNumber = sprintsSnapshot.empty ? -1 :
+          Math.max(...sprintsSnapshot.docs.map(doc => doc.data().numero));
+
+        // Create new sprint with next number in sequence
+        await addDoc(collection(db, 'sprints'), {
+          meta,
+          sprintAtual,
+          dataInicial,
+          dataFinal,
+          observacoes,
+          projectId,
+          numero: lastSprintNumber + 1,
+          createdAt: new Date().toISOString(),
+          createdBy: user?.email || 'anonymous',
+        });
       }
 
-      // Get all sprints for this project and find the highest number
-      const sprintsRef = collection(db, 'sprints');
-      const q = query(sprintsRef, where('projectId', '==', projectId));
-      const sprintsSnapshot = await getDocs(q);
-      const lastSprintNumber = sprintsSnapshot.empty ? -1 :
-        Math.max(...sprintsSnapshot.docs.map(doc => doc.data().numero));
-
-      // Create new sprint with next number in sequence
-      await addDoc(collection(db, 'sprints'), {
-        meta,
-        sprintAtual,
-        dataInicial,
-        dataFinal,
-        observacoes,
-        projectId,
-        numero: lastSprintNumber + 1,
-        createdAt: new Date().toISOString(),
-        createdBy: user?.email || 'anonymous',
-      });
-
-      if (onSprintSaved) {
-        onSprintSaved();
+      if (onSave) {
+        onSave();
       }
-      onBack();
+      onClose();
     } catch (err) {
       setError('Erro ao salvar sprint');
       console.error('Erro ao salvar sprint:', err);
@@ -161,7 +184,7 @@ export default function SprintForm({ projectId, onBack, onSprintSaved }: SprintF
         <div className="flex justify-end gap-4">
           <PrimaryButton
             type="button"
-            onClick={onBack}
+            onClick={onClose}
           >
             Voltar
           </PrimaryButton>
