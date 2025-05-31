@@ -80,7 +80,8 @@ export default function ProjectDetailsPage() {
     const sprintsSnapshot = await getDocs(q);
     console.log('Sprint query results:', sprintsSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() })));
     if (!sprintsSnapshot.empty) {
-      const sprintData = sprintsSnapshot.docs[0].data();
+      const sprintDoc = sprintsSnapshot.docs[0]; // Get the DocumentSnapshot
+      const sprintData = { id: sprintDoc.id, ...sprintDoc.data() } as Sprint; // Combine id and data, then cast
       console.log('Found current sprint:', sprintData);
       setCurrentSprint(sprintData);
     } else {
