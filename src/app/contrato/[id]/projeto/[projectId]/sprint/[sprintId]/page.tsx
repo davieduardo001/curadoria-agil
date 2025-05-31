@@ -17,6 +17,26 @@ import { useParams } from 'next/navigation';
 import { doc, getDoc } from 'firebase/firestore';
 import { db } from '@/lib/firebase';
 
+const formatDate = (dateString: string) => {
+  if (!dateString) return '';
+  const parts = dateString.split('-');
+  if (parts.length === 3) {
+    const year = parseInt(parts[0], 10);
+    const month = parseInt(parts[1], 10) - 1; // JavaScript months are 0-indexed
+    const day = parseInt(parts[2], 10);
+    const date = new Date(year, month, day);
+    if (isNaN(date.getTime())) {
+        return dateString; 
+    }
+    return date.toLocaleDateString('pt-BR', {
+      day: '2-digit',
+      month: '2-digit',
+      year: 'numeric'
+    });
+  }
+  return dateString;
+};
+
 export default function SprintPlanningPage() {
   const { sprintId, projectId } = useParams();
   const [sprintData, setSprintData] = useState<any>(null);
@@ -246,14 +266,14 @@ export default function SprintPlanningPage() {
               <div>
                 <span className="block text-gray-500 text-xs mb-1">Data Inicial</span>
                 <div className="flex items-center font-medium text-gray-800 bg-gray-50 rounded px-3 py-2 min-h-[40px]">
-                  {sprintData.dataInicial ? new Date(sprintData.dataInicial).toLocaleDateString('pt-BR') : '-'}
+                  {formatDate(sprintData.dataInicial) || '-'}
                   <CalendarDaysIcon className="w-4 h-4 text-gray-400 ml-auto" />
                 </div>
               </div>
               <div>
                 <span className="block text-gray-500 text-xs mb-1">Data Final</span>
                 <div className="flex items-center font-medium text-gray-800 bg-gray-50 rounded px-3 py-2 min-h-[40px]">
-                  {sprintData.dataFinal ? new Date(sprintData.dataFinal).toLocaleDateString('pt-BR') : '-'}
+                  {formatDate(sprintData.dataFinal) || '-'}
                   <CalendarDaysIcon className="w-4 h-4 text-gray-400 ml-auto" />
                 </div>
               </div>
