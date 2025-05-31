@@ -10,6 +10,7 @@ import Link from 'next/link';
 import { db } from '@/lib/firebase';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faPenToSquare } from '@fortawesome/free-solid-svg-icons';
+import SecondaryButton from '@/components/SecondaryButton';
 
 export default function Home() {
   const { user, loading } = useAuth();
@@ -88,12 +89,9 @@ export default function Home() {
             <h1 className="text-4xl font-bold text-gray-900">Curadoria Agil</h1>
             <p className="mt-4 mb-8 text-gray-600">Gerencie e refine suas atividades com agilidade. Explore as opções e mantenha o fluxo de trabalho sempre otimizado!</p>
 
-            <button
-              onClick={handleCreateContract}
-              className="px-4 py-2 bg-[#031617] text-white rounded hover:bg-[#031617]/90"
-            >
+            <SecondaryButton onClick={handleCreateContract}>
               Novo Contrato
-            </button>
+            </SecondaryButton>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mt-8 w-full">
               {loadingProjects ? (
