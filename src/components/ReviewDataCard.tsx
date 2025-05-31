@@ -48,7 +48,7 @@ export default function ReviewDataCard({ reviewData, onEdit }: ReviewDataCardPro
   };
 
   return (
-    <div className="bg-white rounded-lg shadow-md mb-8">
+    <div className="bg-white rounded-lg shadow-md mb-8 mt-8">
       {/* Card Header */}
       <div className="flex items-center justify-between p-4 border-b border-gray-200">
         <h2 className="text-xl font-semibold text-gray-800">Dados da Review</h2>
