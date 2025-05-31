@@ -10,6 +10,8 @@ import PlanningDataCard from '@/components/PlanningDataCard';
 import PlanningFormModal from '@/components/PlanningFormModal';
 import ReviewDataCard from '@/components/ReviewDataCard';
 import ReviewFormModal from '@/components/ReviewFormModal';
+import RetrospectiveDataCard from '@/components/RetrospectiveDataCard';
+import RetrospectiveFormModal from '@/components/RetrospectiveFormModal';
 import { useEffect, useState } from 'react';
 import { useParams } from 'next/navigation';
 import { doc, getDoc } from 'firebase/firestore';
@@ -25,6 +27,8 @@ export default function SprintPlanningPage() {
   const [showPlanningEditModal, setShowPlanningEditModal] = useState(false); // For Planning Edit Modal
   const [reviewData, setReviewData] = useState<any>(null);
   const [showReviewEditModal, setShowReviewEditModal] = useState(false);
+  const [retrospectiveData, setRetrospectiveData] = useState<any>(null);
+  const [showRetrospectiveEditModal, setShowRetrospectiveEditModal] = useState(false);
 
   const fetchSprint = async () => {
     if (!sprintId) {
@@ -54,6 +58,7 @@ export default function SprintPlanningPage() {
       fetchSprint();
       fetchPlanning();
       fetchReview();
+      fetchRetrospective();
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [sprintId]);
@@ -71,6 +76,22 @@ export default function SprintPlanningPage() {
     } catch (err) {
       console.error('Error fetching review data:', err);
       setError(prevError => prevError + ' Erro ao buscar dados da review.');
+    }
+  };
+
+  const fetchRetrospective = async () => {
+    if (!sprintId) return;
+    try {
+      const retrospectiveRef = doc(db, 'sprints', sprintId as string, 'retrospective', 'main');
+      const retrospectiveSnap = await getDoc(retrospectiveRef);
+      if (retrospectiveSnap.exists()) {
+        setRetrospectiveData(retrospectiveSnap.data());
+      } else {
+        setRetrospectiveData(null);
+      }
+    } catch (err) {
+      console.error('Error fetching retrospective data:', err);
+      setError(prevError => prevError + ' Erro ao buscar dados da retrospectiva.');
     }
   };
 
@@ -149,6 +170,16 @@ export default function SprintPlanningPage() {
         onReviewSaved={() => {
           fetchReview(); // Re-fetch review data after save
           setShowReviewEditModal(false);
+        }}
+      />
+      <RetrospectiveFormModal
+        isOpen={showRetrospectiveEditModal}
+        onClose={() => setShowRetrospectiveEditModal(false)}
+        sprintId={sprintId as string}
+        initialData={retrospectiveData}
+        onRetrospectiveSaved={() => {
+          fetchRetrospective(); 
+          setShowRetrospectiveEditModal(false);
         }}
       />
       <Navbar />
@@ -246,6 +277,12 @@ export default function SprintPlanningPage() {
         <ReviewDataCard 
           reviewData={reviewData || {}} 
           onEdit={() => setShowReviewEditModal(true)} 
+        />
+
+        {/* Retrospective Data Card */}
+        <RetrospectiveDataCard 
+          retrospectiveData={retrospectiveData || {}} 
+          onEdit={() => setShowRetrospectiveEditModal(true)} 
         />
       </main>
     </div>
