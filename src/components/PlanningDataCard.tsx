@@ -1,7 +1,10 @@
 'use client';
 
 import { useState } from 'react';
-import { PencilIcon, ChevronUpIcon, ChevronDownIcon } from '@heroicons/react/24/outline'; // Assuming Heroicons
+import { ChevronUpIcon, ChevronDownIcon } from '@heroicons/react/24/outline';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faPencilAlt } from '@fortawesome/free-solid-svg-icons';
+import SecondaryButton from './SecondaryButton'; // Assuming path is correct
 
 interface PlanningData {
   dataRealizacao?: string;
@@ -63,13 +66,14 @@ export default function PlanningDataCard({ planningData, onEdit }: PlanningDataC
       <div className="flex items-center justify-between p-4 border-b border-gray-200">
         <h2 className="text-xl font-semibold text-gray-800">Dados da Planning</h2>
         <div className="flex items-center space-x-2">
-          <button
+          <SecondaryButton 
             onClick={onEdit}
-            className="p-1 text-gray-500 hover:text-gray-700 focus:outline-none"
+            className="flex items-center gap-2"
             aria-label="Editar Planning"
           >
-            <PencilIcon className="h-5 w-5" />
-          </button>
+            <FontAwesomeIcon icon={faPencilAlt} className="w-4 h-4" />
+            Editar
+          </SecondaryButton>
           <button
             onClick={() => setIsCollapsed(!isCollapsed)}
             className="p-1 text-gray-500 hover:text-gray-700 focus:outline-none"

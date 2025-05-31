@@ -8,6 +8,8 @@ import SecondaryButton from '@/components/SecondaryButton';
 import SprintFormModal from '@/components/SprintFormModal';
 import PlanningDataCard from '@/components/PlanningDataCard';
 import PlanningFormModal from '@/components/PlanningFormModal';
+import ReviewDataCard from '@/components/ReviewDataCard';
+import ReviewFormModal from '@/components/ReviewFormModal';
 import { useEffect, useState } from 'react';
 import { useParams } from 'next/navigation';
 import { doc, getDoc } from 'firebase/firestore';
@@ -21,6 +23,8 @@ export default function SprintPlanningPage() {
   const [planningData, setPlanningData] = useState<any>(null);
   const [showEditModal, setShowEditModal] = useState(false); // For Sprint Edit Modal
   const [showPlanningEditModal, setShowPlanningEditModal] = useState(false); // For Planning Edit Modal
+  const [reviewData, setReviewData] = useState<any>(null);
+  const [showReviewEditModal, setShowReviewEditModal] = useState(false);
 
   const fetchSprint = async () => {
     if (!sprintId) {
@@ -46,9 +50,29 @@ export default function SprintPlanningPage() {
   };
 
   useEffect(() => {
-    fetchSprint();
+    if (sprintId) {
+      fetchSprint();
+      fetchPlanning();
+      fetchReview();
+    }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [sprintId]);
+
+  const fetchReview = async () => {
+    if (!sprintId) return;
+    try {
+      const reviewRef = doc(db, 'sprints', sprintId as string, 'review', 'main');
+      const reviewSnap = await getDoc(reviewRef);
+      if (reviewSnap.exists()) {
+        setReviewData(reviewSnap.data());
+      } else {
+        setReviewData(null); // No review data found
+      }
+    } catch (err) {
+      console.error('Error fetching review data:', err);
+      setError(prevError => prevError + ' Erro ao buscar dados da review.');
+    }
+  };
 
   const fetchPlanning = async () => {
     if (!sprintId) {
@@ -113,8 +137,18 @@ export default function SprintPlanningPage() {
         sprintId={sprintId as string}
         initialData={planningData}
         onPlanningSaved={() => {
-          fetchPlanning(); // Re-fetch planning data
+          fetchPlanning(); // Only re-fetch planning data
           setShowPlanningEditModal(false);
+        }}
+      />
+      <ReviewFormModal
+        isOpen={showReviewEditModal}
+        onClose={() => setShowReviewEditModal(false)}
+        sprintId={sprintId as string}
+        initialData={reviewData}
+        onReviewSaved={() => {
+          fetchReview(); // Re-fetch review data after save
+          setShowReviewEditModal(false);
         }}
       />
       <Navbar />
@@ -206,6 +240,12 @@ export default function SprintPlanningPage() {
         <PlanningDataCard 
           planningData={planningData || {}} 
           onEdit={() => setShowPlanningEditModal(true)} 
+        />
+
+        {/* Review Data Card */}
+        <ReviewDataCard 
+          reviewData={reviewData || {}} 
+          onEdit={() => setShowReviewEditModal(true)} 
         />
       </main>
     </div>

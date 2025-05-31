@@ -1,6 +1,8 @@
 import { useState } from 'react';
 import { doc, setDoc, collection, getDocs, query, where, addDoc, getDoc } from 'firebase/firestore';
 import { db } from '@/lib/firebase';
+import PrimaryButton from './PrimaryButton';
+import SecondaryButton from './SecondaryButton';
 
 interface PlanningFormProps {
   sprintId: string;
@@ -106,9 +108,11 @@ export default function PlanningForm({ sprintId, initialData, onSave, onClose }:
           <textarea className="form-textarea w-full min-h-[56px]" value={observacoes} onChange={e => setObservacoes(e.target.value)} />
         </div>
       </div>
-      <div className="flex justify-end gap-2 mt-6">
-        <button type="button" className="px-4 py-2 rounded bg-gray-100 text-gray-700" onClick={onClose} disabled={loading}>Cancelar</button>
-        <button type="submit" className="px-4 py-2 rounded bg-emerald-600 text-white" disabled={loading}>{loading ? 'Salvando...' : 'Salvar'}</button>
+      <div className="flex justify-end space-x-3 pt-4">
+        <PrimaryButton type="button" onClick={onClose} disabled={loading}>Cancelar</PrimaryButton>
+        <SecondaryButton type="submit" disabled={loading}>
+          {loading ? 'Salvando...' : 'Salvar'}
+        </SecondaryButton>
       </div>
     </form>
   );
