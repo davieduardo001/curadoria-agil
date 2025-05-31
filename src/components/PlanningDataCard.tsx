@@ -5,14 +5,14 @@ import { PencilIcon, ChevronUpIcon, ChevronDownIcon } from '@heroicons/react/24/
 
 interface PlanningData {
   dataRealizacao?: string;
-  dataEnvioPO?: string;
+  dataEnvioEmailPO?: string; // Corrected from dataEnvioPO
   usMovimentadasAnterior?: number | string;
   quantidadeBugs?: number | string;
   quantidadeUs?: number | string;
   totalStoryPoints?: number | string;
   totalCapacity?: number | string;
-  pontosFuncao?: number | string;
-  usProximaSprint?: boolean;
+  quantidadePontosFuncao?: number | string; // Corrected from pontosFuncao
+  usProximaSprint?: string; // Stored as 'sim'/'nao' in Firestore, will convert to boolean for display
   observacoes?: string;
 }
 
@@ -24,17 +24,36 @@ interface PlanningDataCardProps {
 export default function PlanningDataCard({ planningData, onEdit }: PlanningDataCardProps) {
   const [isCollapsed, setIsCollapsed] = useState(false);
 
+  const formatDate = (dateString?: string) => {
+    if (!dateString) return 'N/A';
+    try {
+      const [year, month, day] = dateString.split('-');
+      if (year && month && day) {
+        return `${day}/${month}/${year}`;
+      }
+      // Fallback for other potential date string formats if necessary, or if it's already formatted
+      const dateObj = new Date(dateString);
+      if (!isNaN(dateObj.getTime())) {
+        return dateObj.toLocaleDateString('pt-BR');
+      }
+    } catch (e) {
+      // If parsing fails, return original or N/A
+    }
+    return dateString; // Or 'N/A' if strict formatting is required
+  };
+
   // Default values for display if data is not provided
   const displayData = {
-    realizationDate: planningData.dataRealizacao || 'N/A',
-    emailPODate: planningData.dataEnvioPO || 'N/A',
+    realizationDate: formatDate(planningData.dataRealizacao),
+    emailPODate: formatDate(planningData.dataEnvioEmailPO), // Corrected field name
     usMovedPreviousSprint: planningData.usMovimentadasAnterior?.toString() || 'N/A',
     bugsQuantity: planningData.quantidadeBugs?.toString() || 'N/A',
     usQuantity: planningData.quantidadeUs?.toString() || 'N/A',
     totalStoryPoints: planningData.totalStoryPoints?.toString() || 'N/A',
     totalCapacity: planningData.totalCapacity?.toString() || 'N/A',
-    functionPoints: planningData.pontosFuncao?.toString() || 'N/A',
-    usNextSprint: planningData.usProximaSprint === undefined ? false : planningData.usProximaSprint,
+    functionPoints: planningData.quantidadePontosFuncao?.toString() || 'N/A', // Corrected field name
+    // Convert 'sim' to true, otherwise false. Handles undefined/null safely.
+    usNextSprint: planningData.usProximaSprint?.toLowerCase() === 'sim',
     observations: planningData.observacoes || 'Nenhuma observação.',
   };
 
