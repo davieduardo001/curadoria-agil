@@ -82,8 +82,8 @@ export default function NewProjectPage() {
             ) : (
               <SprintForm 
                 projectId={projectId!} 
-                onBack={handleBack}
-                onSprintSaved={() => router.push(`/contrato/${contractId}`)}
+                onClose={handleBack} // Use onClose for the 'Voltar' button functionality in SprintForm
+                onSave={() => router.push(`/contrato/${contractId}/projeto/${projectId}`)} // Use onSave for after sprint creation
               />
             )}
             </FormContainer>
